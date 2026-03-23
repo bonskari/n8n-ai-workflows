@@ -1,0 +1,102 @@
+{
+  "name": "AI Document Summarizer & Q&A (Ollama)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "summarize",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Upload Document Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "doc-summarizer"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract text from uploaded file or body text\nconst input = $input.first().json;\nlet text = '';\n\nif (input.body && input.body.text) {\n  text = input.body.text;\n} else if (input.body && input.body.url) {\n  // Will be fetched in next node\n  return [{ json: { text: '', url: input.body.url, mode: 'url' } }];\n} else {\n  text = JSON.stringify(input.body).substring(0, 10000);\n}\n\n// Chunk long documents\nconst maxChunk = 4000;\nconst chunks = [];\nfor (let i = 0; i < text.length; i += maxChunk) {\n  chunks.push(text.substring(i, i + maxChunk));\n}\n\nreturn [{ json: { text: text.substring(0, 8000), chunks: chunks.length, mode: 'text' } }];"
+      },
+      "id": "extract",
+      "name": "Extract & Prepare Text",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3:8b', prompt: 'Summarize this document concisely. Provide:\\n1. A one-paragraph executive summary\\n2. Key points (5-7 bullet points)\\n3. Action items (if any)\\n4. Key entities mentioned (people, companies, dates)\\n\\nDocument:\\n' + $json.text.substring(0, 6000), stream: false, options: { temperature: 0.3, num_predict: 1500 } }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "summarize",
+      "name": "Summarize Document (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3:8b', prompt: 'Based on this document, generate 5 insightful questions that a reader might want answered, along with brief answers based on the document content.\\n\\nDocument:\\n' + $('Extract & Prepare Text').first().json.text.substring(0, 6000) + '\\n\\nFormat as:\\nQ1: [question]\\nA1: [answer]\\n...', stream: false, options: { temperature: 0.4, num_predict: 1500 } }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "qa",
+      "name": "Generate Q&A (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "const summary = JSON.parse($('Summarize Document (Ollama)').first().json.data).response;\nconst qa = JSON.parse($('Generate Q&A (Ollama)').first().json.data).response;\n\nreturn [{\n  json: {\n    summary: summary,\n    questions_and_answers: qa,\n    document_length: $('Extract & Prepare Text').first().json.text.length,\n    chunks_processed: $('Extract & Prepare Text').first().json.chunks,\n    processed_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "combine",
+      "name": "Combine Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}"
+      },
+      "id": "respond",
+      "name": "Return Results",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1200, 400]
+    }
+  ],
+  "connections": {
+    "Upload Document Webhook": {
+      "main": [[{ "node": "Extract & Prepare Text", "type": "main", "index": 0 }]]
+    },
+    "Extract & Prepare Text": {
+      "main": [
+        [
+          { "node": "Summarize Document (Ollama)", "type": "main", "index": 0 },
+          { "node": "Generate Q&A (Ollama)", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Summarize Document (Ollama)": {
+      "main": [[{ "node": "Combine Results", "type": "main", "index": 0 }]]
+    },
+    "Generate Q&A (Ollama)": {
+      "main": [[{ "node": "Combine Results", "type": "main", "index": 0 }]]
+    },
+    "Combine Results": {
+      "main": [[{ "node": "Return Results", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "AI" }, { "name": "Ollama" }, { "name": "Documents" }, { "name": "Summarization" }]
+}

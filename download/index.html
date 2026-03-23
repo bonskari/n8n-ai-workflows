@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Download — AI Workflow Templates</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fafafa;color:#1a1a2e;padding:40px 20px}
+.container{max-width:700px;margin:0 auto}
+h1{font-size:1.8rem;margin-bottom:20px;color:#2e7d32}
+.template{background:white;border-radius:12px;padding:20px;margin:12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;justify-content:space-between;align-items:center}
+.template h3{font-size:1rem;margin-bottom:4px}
+.template p{color:#666;font-size:0.85rem}
+.btn{display:inline-block;padding:8px 20px;border-radius:6px;text-decoration:none;font-weight:600;font-size:0.9rem;background:#667eea;color:white}
+.setup{background:#e3f2fd;border:1px solid #90caf9;border-radius:12px;padding:20px;margin:30px 0}
+.setup h3{color:#1565c0;margin-bottom:10px}
+.setup ol{padding-left:20px;color:#444}
+.setup li{margin-bottom:8px}
+code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:0.9rem}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Your AI Workflow Templates</h1>
+<p style="color:#666;margin-bottom:30px">Download each template below and import into n8n.</p>
+
+<div class="template">
+  <div><h3>📝 AI Blog Writer Pipeline</h3><p>4-stage: Research → Outline → Draft → Edit</p></div>
+  <a href="ai-blog-writer.json" class="btn" download>Download</a>
+</div>
+<div class="template">
+  <div><h3>📧 AI Email Auto-Responder</h3><p>Classify, filter, and auto-reply to emails</p></div>
+  <a href="ai-email-responder.json" class="btn" download>Download</a>
+</div>
+<div class="template">
+  <div><h3>📱 Social Media Content Generator</h3><p>Topic → multi-platform content</p></div>
+  <a href="ai-social-content-generator.json" class="btn" download>Download</a>
+</div>
+<div class="template">
+  <div><h3>🎯 AI Lead Scoring & Enrichment</h3><p>Webhook-triggered lead analysis</p></div>
+  <a href="ai-lead-scorer.json" class="btn" download>Download</a>
+</div>
+<div class="template">
+  <div><h3>🎧 AI Support Ticket Router</h3><p>Classify, prioritize, auto-reply, escalate</p></div>
+  <a href="ai-support-ticket-router.json" class="btn" download>Download</a>
+</div>
+<div class="template">
+  <div><h3>📄 AI Document Summarizer</h3><p>Extract key points from documents</p></div>
+  <a href="ai-document-summarizer.json" class="btn" download>Download</a>
+</div>
+
+<div class="setup">
+  <h3>Quick Setup</h3>
+  <ol>
+    <li>Install <a href="https://n8n.io">n8n</a> and <a href="https://ollama.ai">Ollama</a></li>
+    <li>Pull a model: <code>ollama pull llama3:8b</code></li>
+    <li>In n8n: Settings → Import from File → select the JSON</li>
+    <li>Update the model name in HTTP Request nodes if using a different model</li>
+    <li>Configure any credentials (IMAP for email, etc.)</li>
+    <li>Activate the workflow</li>
+  </ol>
+</div>
+
+<p style="color:#999;font-size:0.85rem;text-align:center;margin-top:30px">Need help? <a href="https://github.com/bonskari/n8n-ai-workflows/issues" style="color:#667eea">Open an issue</a> or email <a href="mailto:admin@unstableentity.com" style="color:#667eea">admin@unstableentity.com</a></p>
+</div>
+</body>
+</html>

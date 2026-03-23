@@ -1,0 +1,154 @@
+{
+  "name": "AI Support Ticket Router & Auto-Reply (Ollama)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "support-ticket",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "New Support Ticket",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "support-router"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3:8b', prompt: 'You are a support ticket analyzer. Analyze this ticket and return ONLY valid JSON.\\n\\nTicket:\\nFrom: ' + ($json.body.email || 'unknown') + '\\nSubject: ' + ($json.body.subject || 'no subject') + '\\nMessage: ' + ($json.body.message || '') + '\\n\\nReturn:\\n{\\n  \"category\": \"BUG|FEATURE_REQUEST|BILLING|ACCOUNT|HOW_TO|INTEGRATION|OTHER\",\\n  \"priority\": \"P1_CRITICAL|P2_HIGH|P3_MEDIUM|P4_LOW\",\\n  \"sentiment\": \"angry|frustrated|neutral|positive\",\\n  \"requires_human\": true/false,\\n  \"suggested_response\": \"A helpful auto-reply (2-3 sentences)\",\\n  \"internal_notes\": \"Brief notes for the support team\",\\n  \"relevant_docs\": \"Suggest which help article topics might be relevant\"\\n}', stream: false, options: { temperature: 0.2, num_predict: 500 } }) }}",
+        "options": { "timeout": 60000 }
+      },
+      "id": "analyze",
+      "name": "Analyze Ticket (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = JSON.parse($input.first().json.data).response;\nconst match = response.match(/\\{[\\s\\S]*\\}/);\nif (match) {\n  const analysis = JSON.parse(match[0]);\n  const ticket = $('New Support Ticket').first().json.body;\n  return [{ json: { ...ticket, ...analysis, analyzed_at: new Date().toISOString() } }];\n}\nthrow new Error('Failed to parse analysis');"
+      },
+      "id": "parse",
+      "name": "Parse Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "combinator": "or",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.priority }}",
+              "rightValue": "P1_CRITICAL",
+              "operator": { "type": "string", "operation": "equals" }
+            },
+            {
+              "leftValue": "={{ $json.requires_human }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ]
+        }
+      },
+      "id": "route",
+      "name": "Needs Human?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "ESCALATE: Route to human agent immediately",
+              "type": "string"
+            },
+            {
+              "id": "auto_reply_sent",
+              "name": "auto_reply_sent",
+              "value": "false",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "escalate",
+      "name": "Escalate to Human",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "AUTO-REPLY: Send suggested response",
+              "type": "string"
+            },
+            {
+              "id": "auto_reply_sent",
+              "name": "auto_reply_sent",
+              "value": "true",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "auto-reply",
+      "name": "Send Auto-Reply",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1200, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'processed', category: $json.category, priority: $json.priority, action: $json.action }) }}"
+      },
+      "id": "respond",
+      "name": "Return Status",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1440, 300]
+    }
+  ],
+  "connections": {
+    "New Support Ticket": {
+      "main": [[{ "node": "Analyze Ticket (Ollama)", "type": "main", "index": 0 }]]
+    },
+    "Analyze Ticket (Ollama)": {
+      "main": [[{ "node": "Parse Analysis", "type": "main", "index": 0 }]]
+    },
+    "Parse Analysis": {
+      "main": [[{ "node": "Needs Human?", "type": "main", "index": 0 }]]
+    },
+    "Needs Human?": {
+      "main": [
+        [{ "node": "Escalate to Human", "type": "main", "index": 0 }],
+        [{ "node": "Send Auto-Reply", "type": "main", "index": 0 }]
+      ]
+    },
+    "Escalate to Human": {
+      "main": [[{ "node": "Return Status", "type": "main", "index": 0 }]]
+    },
+    "Send Auto-Reply": {
+      "main": [[{ "node": "Return Status", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "AI" }, { "name": "Ollama" }, { "name": "Support" }, { "name": "Automation" }]
+}

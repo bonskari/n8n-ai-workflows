@@ -1,0 +1,113 @@
+{
+  "name": "AI Lead Scoring & Enrichment (Ollama)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "lead-scorer"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3:8b', prompt: 'You are a B2B lead scoring expert. Analyze this lead and provide a score from 1-100 and enrichment data.\\n\\nLead info:\\nName: ' + ($json.body.name || 'Unknown') + '\\nEmail: ' + ($json.body.email || 'Unknown') + '\\nCompany: ' + ($json.body.company || 'Unknown') + '\\nJob Title: ' + ($json.body.job_title || 'Unknown') + '\\nMessage: ' + ($json.body.message || 'None') + '\\nSource: ' + ($json.body.source || 'Unknown') + '\\n\\nReturn ONLY valid JSON:\\n{\\n  \"score\": 75,\\n  \"tier\": \"HOT|WARM|COLD\",\\n  \"reasoning\": \"Brief explanation of score\",\\n  \"company_size_estimate\": \"startup|smb|mid-market|enterprise\",\\n  \"likely_use_case\": \"What they probably need\",\\n  \"suggested_action\": \"What to do next\",\\n  \"urgency\": \"high|medium|low\",\\n  \"personalized_opener\": \"Suggested first line for outreach email\"\\n}', stream: false, options: { temperature: 0.3, num_predict: 500 } }) }}",
+        "options": { "timeout": 60000 }
+      },
+      "id": "score",
+      "name": "Score & Enrich Lead (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = JSON.parse($input.first().json.data).response;\nconst match = response.match(/\\{[\\s\\S]*\\}/);\nif (match) {\n  const scored = JSON.parse(match[0]);\n  const lead = $('Webhook Trigger').first().json.body;\n  return [{ json: { ...lead, ...scored, scored_at: new Date().toISOString() } }];\n}\nthrow new Error('Failed to parse scoring response');"
+      },
+      "id": "parse",
+      "name": "Parse Scoring Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.score }}",
+              "operation": "largerEqual",
+              "value2": 70
+            }
+          ]
+        }
+      },
+      "id": "route",
+      "name": "Route by Score",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "PRIORITY: Reach out within 24 hours",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "hot-lead",
+      "name": "Hot Lead (70+)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "action",
+              "name": "action",
+              "value": "Add to nurture sequence",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "warm-lead",
+      "name": "Warm/Cold Lead (<70)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1200, 400]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Score & Enrich Lead (Ollama)", "type": "main", "index": 0 }]]
+    },
+    "Score & Enrich Lead (Ollama)": {
+      "main": [[{ "node": "Parse Scoring Result", "type": "main", "index": 0 }]]
+    },
+    "Parse Scoring Result": {
+      "main": [[{ "node": "Route by Score", "type": "main", "index": 0 }]]
+    },
+    "Route by Score": {
+      "main": [
+        [{ "node": "Hot Lead (70+)", "type": "main", "index": 0 }],
+        [{ "node": "Warm/Cold Lead (<70)", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "AI" }, { "name": "Ollama" }, { "name": "Sales" }, { "name": "Lead Scoring" }]
+}
