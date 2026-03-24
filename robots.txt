@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bonskari.github.io/n8n-ai-workflows/sitemap.xml

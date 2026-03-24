@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>n8n + Ollama Tutorial: Automate Everything with Local AI (No API Keys)</title>
+    <meta name="description" content="Step-by-step tutorial for connecting n8n to Ollama for local AI automation. Generate content, classify emails, score leads, and extract data without any API keys or monthly costs.">
+    <meta property="og:title" content="n8n + Ollama Tutorial: Local AI Automation Without API Keys">
+    <meta property="og:description" content="Complete tutorial for building AI automations with n8n and Ollama. Zero API costs, full privacy.">
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ollama-tutorial-local-ai-automation.html">
+    <style>
+        :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+        .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav { padding: 1rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; line-height: 1.3; }
+        h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; color: var(--accent); }
+        h3 { font-size: 1.2rem; margin: 2rem 0 0.75rem; }
+        p { margin-bottom: 1.2rem; }
+        .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        code { background: var(--surface); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem; color: var(--green); }
+        pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; overflow-x: auto; }
+        pre code { background: none; padding: 0; color: var(--text); }
+        ul, ol { margin: 0 0 1.2rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        .highlight { background: rgba(88,166,255,0.1); border-left: 3px solid var(--accent); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0; }
+        .cta-box { background: var(--surface); border: 2px solid var(--green); border-radius: 12px; padding: 2rem; text-align: center; margin: 3rem 0; }
+        .cta-box h3 { color: var(--green); margin-top: 0; }
+        .cta-btn { display: inline-block; background: var(--green); color: #000; padding: 0.8rem 2rem; border-radius: 8px; font-weight: 700; text-decoration: none; margin-top: 1rem; }
+        a { color: var(--accent); }
+        .step { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin: 1.5rem 0; }
+        .step-number { display: inline-block; background: var(--accent); color: #000; width: 28px; height: 28px; border-radius: 50%; text-align: center; line-height: 28px; font-weight: 700; margin-right: 0.5rem; font-size: 0.85rem; }
+    </style>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "n8n + Ollama Tutorial: Automate Everything with Local AI",
+        "description": "Step-by-step tutorial for local AI automation with n8n and Ollama",
+        "datePublished": "2026-03-24",
+        "proficiencyLevel": "Beginner"
+    }
+    </script>
+</head>
+<body>
+<div class="container">
+    <nav><a href="../">&larr; Self-Hosted AI Workflow Pack</a></nav>
+
+    <h1>n8n + Ollama Tutorial: Automate Everything with Local AI (No API Keys)</h1>
+    <p class="meta">Published March 24, 2026 &middot; 15 min read &middot; Beginner-friendly</p>
+
+    <p>If you've been wanting to add AI to your automation workflows but don't want to pay for OpenAI API keys or send your data to the cloud, this tutorial is for you. We'll connect <strong>n8n</strong> (the open-source workflow automation tool) with <strong>Ollama</strong> (local AI model runner) to build powerful automations that run entirely on your own hardware.</p>
+
+    <div class="highlight">
+        <strong>What you'll build:</strong> An email classification and auto-response system that reads incoming emails, categorizes them (support, sales, spam), and drafts appropriate replies &mdash; all using local AI.
+    </div>
+
+    <h2>Prerequisites</h2>
+    <ul>
+        <li>A computer with at least 8 GB RAM (16 GB recommended)</li>
+        <li>Basic familiarity with n8n (we'll explain everything, but knowing the UI helps)</li>
+        <li>~15 minutes of time</li>
+    </ul>
+
+    <h2>Part 1: Install the Stack</h2>
+
+    <div class="step">
+        <p><span class="step-number">1</span> <strong>Install Ollama</strong></p>
+        <pre><code># One-line install (Linux/macOS)
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Pull a model
+ollama pull llama3:8b
+
+# Test it works
+curl http://localhost:11434/api/generate -d '{
+  "model": "llama3:8b",
+  "prompt": "Say hello in JSON format",
+  "stream": false
+}'</code></pre>
+        <p>You should see a JSON response with the model's reply. If you get a connection error, run <code>ollama serve</code> first.</p>
+    </div>
+
+    <div class="step">
+        <p><span class="step-number">2</span> <strong>Install n8n</strong></p>
+        <pre><code># Option A: Docker (recommended)
+docker run -d --name n8n \
+  -p 5678:5678 \
+  -v n8n_data:/home/node/.n8n \
+  --add-host=host.docker.internal:host-gateway \
+  n8nio/n8n
+
+# Option B: npm
+npm install n8n -g && n8n start</code></pre>
+        <p>Open <code>http://localhost:5678</code> and create your admin account.</p>
+    </div>
+
+    <div class="step">
+        <p><span class="step-number">3</span> <strong>Verify the connection</strong></p>
+        <p>In n8n, create a new workflow with an HTTP Request node:</p>
+        <ul>
+            <li><strong>URL:</strong> <code>http://localhost:11434/api/tags</code> (or <code>http://host.docker.internal:11434/api/tags</code> for Docker)</li>
+            <li><strong>Method:</strong> GET</li>
+        </ul>
+        <p>Execute it. You should see a list of your installed models. If this works, n8n can talk to Ollama.</p>
+    </div>
+
+    <h2>Part 2: Build the Email Classifier</h2>
+
+    <p>Our workflow will have 4 nodes:</p>
+    <ol>
+        <li><strong>Trigger</strong> &mdash; Manual trigger (or connect to your email via IMAP)</li>
+        <li><strong>Classify</strong> &mdash; AI classifies the email intent</li>
+        <li><strong>Route</strong> &mdash; Switch node routes based on classification</li>
+        <li><strong>Draft Response</strong> &mdash; AI drafts an appropriate reply</li>
+    </ol>
+
+    <h3>Node 1: The Trigger</h3>
+    <p>Start with a <strong>Manual Trigger</strong> for testing. Later, you can swap it for an <strong>IMAP Email</strong> trigger to process real emails automatically.</p>
+    <p>Add a <strong>Set</strong> node after the trigger to simulate an email:</p>
+    <pre><code>{
+  "from": "john@example.com",
+  "subject": "Can't log in to my account",
+  "body": "Hi, I've been trying to log in for the past hour but keep getting an 'invalid credentials' error. I've tried resetting my password twice. This is really frustrating. Can someone help?"
+}</code></pre>
+
+    <h3>Node 2: AI Classification</h3>
+    <p>Add an <strong>HTTP Request</strong> node to call Ollama:</p>
+    <pre><code>URL: http://localhost:11434/api/generate
+Method: POST
+Body (JSON):
+{
+  "model": "llama3:8b",
+  "prompt": "Classify this email into exactly ONE category: support, sales, partnership, feedback, spam.\n\nAlso rate the urgency: low, medium, high.\nAnd detect the sentiment: positive, neutral, negative.\n\nEmail from: {{ $json.from }}\nSubject: {{ $json.subject }}\nBody: {{ $json.body }}\n\nRespond with ONLY JSON:\n{\"category\": \"...\", \"urgency\": \"...\", \"sentiment\": \"...\", \"reason\": \"...\"}",
+  "stream": false,
+  "options": { "temperature": 0.1 }
+}</code></pre>
+    <p>Low temperature (0.1) ensures consistent, deterministic classification.</p>
+
+    <h3>Node 3: Parse and Route</h3>
+    <p>Add a <strong>Code</strong> node to parse the AI response:</p>
+    <pre><code>const response = $input.first().json.response;
+const match = response.match(/\{[\s\S]*\}/);
+if (match) {
+  const classification = JSON.parse(match[0]);
+  return [{ json: {
+    ...classification,
+    original_email: $('Set').first().json
+  }}];
+}
+throw new Error('Could not parse AI classification');</code></pre>
+    <p>Then add a <strong>Switch</strong> node that routes based on <code>{{ $json.category }}</code>:</p>
+    <ul>
+        <li><code>support</code> &rarr; Draft support response</li>
+        <li><code>sales</code> &rarr; Draft sales response</li>
+        <li><code>spam</code> &rarr; Archive/delete</li>
+        <li>Default &rarr; Forward to team</li>
+    </ul>
+
+    <h3>Node 4: Draft Response</h3>
+    <p>For each route, add another HTTP Request to Ollama:</p>
+    <pre><code>{
+  "model": "llama3:8b",
+  "prompt": "Draft a helpful reply to this support email.\n\nFrom: {{ $json.original_email.from }}\nSubject: {{ $json.original_email.subject }}\nBody: {{ $json.original_email.body }}\n\nBe empathetic, professional, and solution-oriented. Include specific troubleshooting steps.\n\nWrite the reply only, no subject line needed.",
+  "stream": false,
+  "options": { "temperature": 0.5 }
+}</code></pre>
+
+    <h2>Part 3: Taking It Further</h2>
+    <p>This basic pattern &mdash; send text to Ollama, parse the JSON response, route based on the result &mdash; powers virtually every AI automation. Here's what you can build with it:</p>
+
+    <ul>
+        <li><strong>Content pipeline:</strong> Topic &rarr; research &rarr; outline &rarr; draft &rarr; edit &rarr; publish</li>
+        <li><strong>Lead scoring:</strong> New signup &rarr; AI analyzes company &amp; role &rarr; assigns score &rarr; routes to sales or nurture</li>
+        <li><strong>Document processing:</strong> Upload document &rarr; AI summarizes &rarr; extracts key data &rarr; populates database</li>
+        <li><strong>Meeting follow-up:</strong> Transcript &rarr; AI extracts action items &rarr; creates tasks in project management tool</li>
+    </ul>
+
+    <h2>Common Issues and Fixes</h2>
+    <ul>
+        <li><strong>"Connection refused"</strong> &mdash; Ollama isn't running. Start it with <code>ollama serve</code></li>
+        <li><strong>Timeout errors</strong> &mdash; Increase the HTTP Request timeout to 120000ms or more</li>
+        <li><strong>Bad JSON output</strong> &mdash; Add "Return ONLY valid JSON, no other text" to your prompts. Use temperature 0.1-0.3 for structured output</li>
+        <li><strong>Docker can't reach Ollama</strong> &mdash; Use <code>http://host.docker.internal:11434</code> instead of <code>localhost</code></li>
+        <li><strong>Slow generation</strong> &mdash; Use a smaller model (<code>mistral:7b</code>) or get a GPU. Even a modest GPU (RTX 3060) makes 5-10x difference</li>
+    </ul>
+
+    <div class="cta-box">
+        <h3>Want Pre-Built Workflows?</h3>
+        <p>Skip the setup. We've built 11 production-ready n8n + Ollama workflows covering content generation, email automation, lead scoring, document processing, and more.</p>
+        <p><strong>$39 one-time &mdash; import into n8n in 5 minutes</strong></p>
+        <a href="../" class="cta-btn">Get 11 Ready-Made Workflows &rarr;</a>
+    </div>
+
+    <h3>Free Samples</h3>
+    <p>Try before you buy:</p>
+    <ul>
+        <li><a href="https://github.com/bonskari/n8n-ollama-social-content">Free workflow: Social Media Content Generator</a></li>
+        <li><a href="https://github.com/bonskari/n8n-ollama-blog-writer">Free workflow: AI Blog Writer Pipeline</a></li>
+    </ul>
+
+    <h3>Further Reading</h3>
+    <ul>
+        <li><a href="self-hosted-ai-workflows-n8n-ollama.html">How to Build Self-Hosted AI Workflows with n8n and Ollama</a></li>
+        <li><a href="https://docs.n8n.io/">n8n Documentation</a></li>
+        <li><a href="https://ollama.ai/">Ollama Official Site</a></li>
+    </ul>
+
+    <hr style="margin: 3rem 0; border: 0; border-top: 1px solid var(--border);">
+    <p style="color: var(--muted); font-size: 0.85rem;">Published by WorkflowForge &middot; <a href="../">Self-Hosted AI Workflow Pack</a></p>
+</div>
+</body>
+</html>

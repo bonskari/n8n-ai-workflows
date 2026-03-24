@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Build Self-Hosted AI Workflows with n8n and Ollama (2026 Guide)</title>
+    <meta name="description" content="Complete guide to building AI-powered automation workflows using n8n and Ollama. Run local AI models for content generation, email automation, lead scoring, and more. No API keys needed.">
+    <meta property="og:title" content="How to Build Self-Hosted AI Workflows with n8n and Ollama">
+    <meta property="og:description" content="Run AI automation locally with n8n + Ollama. No API keys, no monthly costs. Step-by-step guide.">
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="https://bonskari.github.io/n8n-ai-workflows/blog/self-hosted-ai-workflows-n8n-ollama.html">
+    <style>
+        :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+        .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav { padding: 1rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; line-height: 1.3; }
+        h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; color: var(--accent); }
+        h3 { font-size: 1.2rem; margin: 2rem 0 0.75rem; }
+        p { margin-bottom: 1.2rem; color: var(--text); }
+        .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        code { background: var(--surface); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem; color: var(--green); }
+        pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; overflow-x: auto; }
+        pre code { background: none; padding: 0; color: var(--text); }
+        ul, ol { margin: 0 0 1.2rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        .highlight { background: rgba(88,166,255,0.1); border-left: 3px solid var(--accent); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0; }
+        .cta-box { background: var(--surface); border: 2px solid var(--green); border-radius: 12px; padding: 2rem; text-align: center; margin: 3rem 0; }
+        .cta-box h3 { color: var(--green); margin-top: 0; }
+        .cta-btn { display: inline-block; background: var(--green); color: #000; padding: 0.8rem 2rem; border-radius: 8px; font-weight: 700; text-decoration: none; margin-top: 1rem; }
+        .cta-btn:hover { background: #4cc963; }
+        a { color: var(--accent); }
+        .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 2rem 0; }
+        .toc h4 { margin-bottom: 0.75rem; color: var(--muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.1em; }
+        .toc ul { list-style: none; margin: 0; padding: 0; }
+        .toc li { margin-bottom: 0.4rem; }
+        .toc a { color: var(--text); text-decoration: none; }
+        .toc a:hover { color: var(--accent); }
+    </style>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "How to Build Self-Hosted AI Workflows with n8n and Ollama (2026 Guide)",
+        "description": "Complete guide to building AI-powered automation workflows using n8n and Ollama. No API keys needed.",
+        "datePublished": "2026-03-24",
+        "author": { "@type": "Organization", "name": "WorkflowForge" }
+    }
+    </script>
+</head>
+<body>
+<div class="container">
+    <nav><a href="../">&larr; Self-Hosted AI Workflow Pack</a></nav>
+
+    <h1>How to Build Self-Hosted AI Workflows with n8n and Ollama (2026 Guide)</h1>
+    <p class="meta">Published March 24, 2026 &middot; 12 min read</p>
+
+    <div class="toc">
+        <h4>Table of Contents</h4>
+        <ul>
+            <li><a href="#why">Why Self-Hosted AI?</a></li>
+            <li><a href="#setup">Setting Up n8n + Ollama</a></li>
+            <li><a href="#first-workflow">Your First AI Workflow</a></li>
+            <li><a href="#use-cases">10 Practical Use Cases</a></li>
+            <li><a href="#best-practices">Best Practices</a></li>
+            <li><a href="#models">Choosing the Right Model</a></li>
+            <li><a href="#templates">Ready-Made Templates</a></li>
+        </ul>
+    </div>
+
+    <h2 id="why">Why Self-Hosted AI Matters in 2026</h2>
+    <p>The AI automation landscape has shifted dramatically. While cloud AI APIs like OpenAI and Anthropic remain popular, a growing number of teams are moving to self-hosted solutions. The reasons are compelling:</p>
+    <ul>
+        <li><strong>Zero API costs</strong> &mdash; Run thousands of AI tasks per day without spending a cent on API calls</li>
+        <li><strong>Complete data privacy</strong> &mdash; Your data never leaves your network. Critical for healthcare, legal, and finance</li>
+        <li><strong>No rate limits</strong> &mdash; Process as fast as your hardware allows, with no throttling</li>
+        <li><strong>No vendor lock-in</strong> &mdash; Switch models freely. Today Llama 3, tomorrow Mistral, next week a fine-tuned model</li>
+        <li><strong>Offline capability</strong> &mdash; Your AI workflows keep running even without internet</li>
+    </ul>
+
+    <div class="highlight">
+        <strong>The cost difference is real.</strong> A team running 1,000 AI-powered automations per day on GPT-4 spends ~$300-600/month on API calls alone. The same workload on a self-hosted Llama 3 model? $0/month after the one-time hardware cost.
+    </div>
+
+    <h2 id="setup">Setting Up n8n + Ollama (15 Minutes)</h2>
+    <p>The stack is simple: <strong>n8n</strong> handles the workflow automation (triggers, routing, integrations with 400+ apps), and <strong>Ollama</strong> runs the AI models locally.</p>
+
+    <h3>Step 1: Install Ollama</h3>
+    <pre><code># Linux/macOS
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Pull a model (Llama 3 8B is a great starting point)
+ollama pull llama3:8b
+
+# Verify it's running
+curl http://localhost:11434/api/tags</code></pre>
+
+    <h3>Step 2: Install n8n</h3>
+    <pre><code># Using Docker (recommended)
+docker run -d --name n8n \
+  -p 5678:5678 \
+  -v n8n_data:/home/node/.n8n \
+  --add-host=host.docker.internal:host-gateway \
+  n8nio/n8n
+
+# Or using npm
+npm install n8n -g
+n8n start</code></pre>
+    <p>Open <code>http://localhost:5678</code> in your browser. That's it &mdash; you're ready to build AI workflows.</p>
+
+    <h3>Step 3: Connect n8n to Ollama</h3>
+    <p>n8n communicates with Ollama via HTTP. Every AI step in your workflow is simply an HTTP Request node pointing to <code>http://localhost:11434/api/generate</code> (or <code>http://host.docker.internal:11434/api/generate</code> if n8n runs in Docker).</p>
+
+    <h2 id="first-workflow">Your First AI Workflow: Blog Post Generator</h2>
+    <p>Let's build a practical workflow that generates a blog post from a topic. This workflow uses a 4-stage pipeline that mimics a real editorial process:</p>
+    <ol>
+        <li><strong>Research</strong> &mdash; AI identifies key points, angles, and structure</li>
+        <li><strong>Outline</strong> &mdash; AI creates a detailed content outline</li>
+        <li><strong>Draft</strong> &mdash; AI writes the full post based on the outline</li>
+        <li><strong>Edit</strong> &mdash; AI polishes grammar, flow, and SEO</li>
+    </ol>
+    <p>Each stage builds on the previous one, producing much better results than a single "write me a blog post" prompt.</p>
+
+    <div class="highlight">
+        <strong>Pro tip:</strong> Multi-stage workflows consistently outperform single-prompt approaches. The AI has focused context at each stage, leading to more coherent and polished output.
+    </div>
+
+    <h3>The Key Pattern: HTTP Request to Ollama</h3>
+    <pre><code>// In your n8n HTTP Request node:
+URL: http://localhost:11434/api/generate
+Method: POST
+Body (JSON):
+{
+  "model": "llama3:8b",
+  "prompt": "Your prompt here with {{ $json.variable }} interpolation",
+  "stream": false,
+  "options": {
+    "temperature": 0.7,
+    "num_predict": 2000
+  }
+}</code></pre>
+
+    <h2 id="use-cases">10 Practical AI Workflow Use Cases</h2>
+
+    <h3>1. Content Generation Pipeline</h3>
+    <p>Generate blog posts, social media content, and newsletters from a single topic input. A content repurposer workflow can turn one blog post into Twitter threads, LinkedIn posts, Reddit submissions, and Instagram captions.</p>
+
+    <h3>2. Email Auto-Responder</h3>
+    <p>Classify incoming emails by intent (support request, sales inquiry, spam), extract key information, and draft appropriate responses. The AI handles triage while you handle only the complex cases.</p>
+
+    <h3>3. Lead Scoring</h3>
+    <p>When a new lead comes in via your CRM or form, AI analyzes the company, role, and message to assign a priority score. Hot leads get instant notifications; cold leads enter a nurture sequence.</p>
+
+    <h3>4. Document Summarization</h3>
+    <p>Drop a long document, meeting transcript, or research paper into the workflow and get a structured summary with key takeaways, action items, and automatically generated Q&A pairs.</p>
+
+    <h3>5. Support Ticket Router</h3>
+    <p>Incoming support tickets get automatically categorized by department, priority, and sentiment. Urgent negative-sentiment tickets get escalated immediately.</p>
+
+    <h3>6. Competitor Monitoring</h3>
+    <p>Track competitor websites, blogs, and social media. AI summarizes changes and sends you a weekly intelligence briefing highlighting pricing changes, new features, and strategic moves.</p>
+
+    <h3>7. Meeting Notes Processor</h3>
+    <p>Feed in meeting transcripts (from Otter.ai, Fireflies, or any transcription tool) and get structured summaries with decisions made, action items with owners, and follow-up tasks.</p>
+
+    <h3>8. Data Extraction</h3>
+    <p>Extract structured JSON data from unstructured text &mdash; invoices, resumes, product descriptions, legal documents. Define your schema, and the AI extracts matching data consistently.</p>
+
+    <h3>9. YouTube-to-Newsletter</h3>
+    <p>Paste a YouTube URL, and the workflow fetches the transcript, summarizes key points, and formats everything as a ready-to-send email newsletter.</p>
+
+    <h3>10. Social Media Content Generator</h3>
+    <p>Enter a topic and brand voice, and get optimized content for Twitter, LinkedIn, Reddit, and Instagram. Includes an AI review pass for quality assurance.</p>
+
+    <h2 id="best-practices">Best Practices for n8n + Ollama Workflows</h2>
+    <ul>
+        <li><strong>Use multi-stage pipelines</strong> &mdash; Break complex tasks into 3-5 focused steps rather than one massive prompt</li>
+        <li><strong>Set appropriate timeouts</strong> &mdash; Local models can take 30-120 seconds per generation. Set HTTP timeouts to at least 120000ms</li>
+        <li><strong>Use JSON mode</strong> &mdash; When you need structured output, explicitly ask for JSON in your prompt and parse it with a Code node</li>
+        <li><strong>Vary temperature by task</strong> &mdash; Creative tasks (content writing): 0.7-0.9. Analytical tasks (classification, extraction): 0.1-0.3</li>
+        <li><strong>Add error handling</strong> &mdash; Wrap AI nodes in try/catch blocks. LLMs occasionally produce unparseable output</li>
+        <li><strong>Cache frequent queries</strong> &mdash; If you're generating similar content repeatedly, cache results in a database</li>
+    </ul>
+
+    <h2 id="models">Choosing the Right Ollama Model</h2>
+    <table style="width:100%; border-collapse:collapse; background:var(--surface); border-radius:8px; overflow:hidden; margin:1.5rem 0;">
+        <tr style="background:rgba(88,166,255,0.1);">
+            <th style="padding:0.75rem 1rem; text-align:left; border-bottom:1px solid var(--border);">Model</th>
+            <th style="padding:0.75rem 1rem; text-align:left; border-bottom:1px solid var(--border);">RAM Needed</th>
+            <th style="padding:0.75rem 1rem; text-align:left; border-bottom:1px solid var(--border);">Best For</th>
+        </tr>
+        <tr><td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border);"><code>llama3:8b</code></td><td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border);">8 GB</td><td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border);">General purpose, good balance of speed and quality</td></tr>
+        <tr><td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border);"><code>mistral:7b</code></td><td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border);">8 GB</td><td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border);">Concise outputs, fast, good for classification</td></tr>
+        <tr><td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border);"><code>mixtral:8x7b</code></td><td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border);">32 GB</td><td style="padding:0.75rem 1rem; border-bottom:1px solid var(--border);">Higher quality, good for complex content</td></tr>
+        <tr><td style="padding:0.75rem 1rem;"><code>llama3:70b</code></td><td style="padding:0.75rem 1rem;">48 GB</td><td style="padding:0.75rem 1rem;">Best quality, comparable to cloud APIs</td></tr>
+    </table>
+
+    <h2 id="templates">Skip the Setup: Ready-Made Templates</h2>
+    <p>Building these workflows from scratch takes hours of prompt engineering and testing. If you want to skip straight to production-ready workflows, we've built a pack of 11 templates that cover all the use cases above.</p>
+
+    <div class="cta-box">
+        <h3>Self-Hosted AI Workflow Pack</h3>
+        <p>11 production-ready n8n workflows for Ollama. Content generation, email automation, lead scoring, document processing, and more. Import into n8n in 5 minutes.</p>
+        <p><strong>$39 one-time &mdash; no subscriptions, no API costs</strong></p>
+        <a href="../" class="cta-btn">Get the Workflow Pack &rarr;</a>
+    </div>
+
+    <p>Or try a free sample first:</p>
+    <ul>
+        <li><a href="https://github.com/bonskari/n8n-ollama-social-content">Free: Social Media Content Generator workflow</a></li>
+        <li><a href="https://github.com/bonskari/n8n-ollama-blog-writer">Free: AI Blog Writer Pipeline workflow</a></li>
+    </ul>
+
+    <hr style="margin: 3rem 0; border: 0; border-top: 1px solid var(--border);">
+    <p style="color: var(--muted); font-size: 0.85rem;">Published by WorkflowForge &middot; <a href="../">Self-Hosted AI Workflow Pack</a></p>
+</div>
+</body>
+</html>
