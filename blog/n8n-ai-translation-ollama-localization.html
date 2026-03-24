@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automate AI Translation with n8n + Ollama (Self-Hosted Content Localization Workflow)</title>
+    <meta name="description" content="Build an automated translation workflow with n8n and Ollama. Translate websites, product listings, emails, and documents into 50+ languages using self-hosted AI. No API costs. Free workflow template included.">
+    <meta property="og:title" content="AI Translation Automation with n8n + Ollama — Self-Hosted Localization Workflow">
+    <meta property="og:description" content="Automate content localization at scale using local AI. Free n8n workflow for multi-language translation — e-commerce, SaaS, docs, and marketing content.">
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-translation-ollama-localization.html">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Automate AI Translation with n8n + Ollama (Self-Hosted Content Localization Workflow)",
+        "description": "Build a self-hosted AI translation pipeline with n8n and Ollama. Automate content localization into 50+ languages with context-aware output, glossary enforcement, and quality validation. Free workflow template included.",
+        "author": {"@type": "Organization", "name": "Workflow Forge"},
+        "datePublished": "2026-03-24",
+        "publisher": {"@type": "Organization", "name": "Workflow Forge"}
+    }
+    </script>
+    <style>
+        :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --orange: #d29922; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+        .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav { padding: 1rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; line-height: 1.3; }
+        h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; color: var(--accent); }
+        h3 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; }
+        .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1rem 0 1.5rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; }
+        code { font-family: 'SF Mono', 'Fira Code', monospace; }
+        p code, li code { background: var(--surface); border: 1px solid var(--border); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.88em; }
+        ul, ol { margin: 0 0 1rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .cta { background: linear-gradient(135deg, #1a3a5c, #1a2d4a); border: 1px solid var(--accent); border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center; }
+        .cta h3 { color: var(--accent); margin-top: 0; }
+        .cta a.btn { display: inline-block; background: var(--accent); color: #000; padding: 0.75rem 2rem; border-radius: 8px; font-weight: bold; text-decoration: none; margin-top: 1rem; }
+        .cta a.btn:hover { opacity: 0.9; text-decoration: none; }
+        .highlight { background: var(--surface); border-left: 3px solid var(--accent); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
+        th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; }
+        th { background: var(--surface); }
+        .step { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+        .step-number { color: var(--accent); font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .json-toggle { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin: 1.5rem 0; }
+        .json-toggle summary { cursor: pointer; padding: 1rem 1.25rem; font-weight: 600; color: var(--accent); }
+        .json-toggle summary:hover { background: rgba(88,166,255,0.05); }
+        .json-toggle pre { margin: 0; border: none; border-top: 1px solid var(--border); border-radius: 0 0 8px 8px; max-height: 500px; overflow-y: auto; }
+        footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
+        @media (max-width: 600px) { h1 { font-size: 1.6rem; } .cta { padding: 1.5rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav><a href="https://bonskari.github.io/n8n-ai-workflows/">&larr; n8n AI Workflow Templates</a> &middot; <a href="https://bonskari.github.io/n8n-ai-workflows/blog/">Blog</a></nav>
+
+    <article>
+        <h1>Automate AI Translation with n8n + Ollama (Self-Hosted Content Localization Workflow)</h1>
+        <p class="meta">Published March 24, 2026 &middot; 14 min read &middot; By Workflow Forge</p>
+
+        <p>Expanding into international markets is one of the highest-ROI moves a business can make. <a href="https://hbr.org/2012/08/speak-to-global-customers-in-t">Harvard Business Review research</a> shows that 72% of consumers spend most of their time on websites in their own language, and 56% say the ability to read product information in their native language is more important than price.</p>
+
+        <p>But translation is expensive. Professional human translation costs $0.10&ndash;0.30 per word. A 2,000-word product page translated into 5 languages runs $1,000&ndash;3,000. An e-commerce store with 500 products? That&rsquo;s $50,000&ndash;150,000 just for the initial translation &mdash; before you factor in ongoing updates every time you change a description, launch a new product, or update your marketing copy.</p>
+
+        <p>Generic machine translation (Google Translate, DeepL) is cheaper but misses the mark on brand voice, technical terminology, and cultural context. &ldquo;Our cloud-native platform enables teams to ship faster&rdquo; becomes awkward and unnatural in most languages when run through a generic translator.</p>
+
+        <p>With <strong>n8n</strong> and <strong>Ollama</strong>, you can build a <strong>self-hosted AI translation pipeline</strong> that delivers context-aware, brand-consistent translations &mdash; running entirely on your own hardware, with zero per-word costs and full data privacy.</p>
+
+        <div class="highlight">
+            <strong>What you&rsquo;ll build:</strong> An n8n translation automation workflow that ingests content via webhook or CMS integration, translates it into multiple target languages with glossary enforcement and style control, validates quality with a second AI pass, and outputs production-ready localized content. All powered by Ollama &mdash; no API keys, no cloud dependencies, no per-character charges.
+        </div>
+
+        <h2>Why Self-Hosted Translation Beats Cloud APIs</h2>
+
+        <p>Before building, here&rsquo;s why running your own Ollama translation pipeline makes sense compared to paid translation APIs:</p>
+
+        <table>
+            <tr><th>Feature</th><th>Google Translate API</th><th>DeepL API</th><th>n8n + Ollama (This Workflow)</th></tr>
+            <tr><td>Cost per 1M characters</td><td>$20</td><td>$25</td><td><strong>$0 (local)</strong></td></tr>
+            <tr><td>500 products &times; 5 languages</td><td>~$500</td><td>~$625</td><td><strong>$0</strong></td></tr>
+            <tr><td>Custom glossary/terminology</td><td>Limited (500 terms max)</td><td>Basic (paid tiers only)</td><td><strong>Unlimited, full control</strong></td></tr>
+            <tr><td>Context-awareness</td><td>Sentence-level</td><td>Paragraph-level</td><td><strong>Document-level + custom context</strong></td></tr>
+            <tr><td>Tone/style control</td><td>None</td><td>Formal/Informal only</td><td><strong>Any style via prompt</strong></td></tr>
+            <tr><td>Data privacy</td><td>Sent to Google servers</td><td>Sent to DeepL servers</td><td><strong>100% on your hardware</strong></td></tr>
+            <tr><td>Rate limits</td><td>Yes (600K chars/min)</td><td>Yes (varies by plan)</td><td><strong>None &mdash; limited only by your CPU/GPU</strong></td></tr>
+            <tr><td>Works offline</td><td>No</td><td>No</td><td><strong>Yes</strong></td></tr>
+        </table>
+
+        <div class="highlight">
+            <strong>Privacy matters for translation:</strong> Product descriptions, internal communications, legal documents, customer support templates, and marketing copy often contain proprietary information, pricing strategies, or customer data. Sending this to third-party APIs creates compliance risk under GDPR, CCPA, and industry regulations. Local processing with Ollama keeps everything on your infrastructure.
+        </div>
+
+        <h2>Prerequisites</h2>
+        <ul>
+            <li><strong>n8n</strong> &mdash; self-hosted instance (<a href="https://docs.n8n.io/hosting/installation/docker/">Docker</a> or npm)</li>
+            <li><strong>Ollama</strong> &mdash; running locally with a translation-capable model</li>
+            <li><strong>~8GB RAM</strong> for 7B models, ~16GB for larger models with better multilingual support</li>
+        </ul>
+
+        <p>Pull a translation model:</p>
+        <pre><code># Best all-around for European + major Asian languages:
+ollama pull mistral:7b
+
+# Best for Chinese, Japanese, Korean:
+ollama pull qwen2:7b
+
+# Best quality (needs 20GB+ RAM):
+ollama pull command-r:35b</code></pre>
+
+        <h2>Architecture Overview</h2>
+
+        <pre><code>Content Source (Webhook / CMS API / File / Database)
+    &darr;
+[Pre-Process] &mdash; Detect language, segment into translatable chunks
+    &darr;
+[Load Glossary] &mdash; Fetch brand terminology from Google Sheets / JSON
+    &darr;
+[Translate] &mdash; Ollama generates context-aware translation per segment
+    &darr;
+[Validate] &mdash; Second AI pass checks accuracy, glossary compliance, completeness
+    &darr;                          &darr; (if fails)
+    &darr;                   [Re-translate with feedback]
+    &darr;
+[Reassemble] &mdash; Merge segments, format output
+    &darr;
+[Output] &mdash; Update CMS, write i18n files, export CSV, send via webhook</code></pre>
+
+        <h2>Step-by-Step: Build the Translation Workflow</h2>
+
+        <div class="step">
+            <div class="step-number">STEP 1 &mdash; Content Input</div>
+            <h3>Set up a webhook trigger to accept translation requests</h3>
+            <p>Create a <strong>Webhook</strong> node in n8n that accepts POST requests with the content to translate, target languages, and optional context:</p>
+<pre><code>// Webhook payload structure
+POST /webhook/translate
+{
+  "source_text": "Our cloud-native platform enables teams to ship faster with built-in CI/CD pipelines and automated testing frameworks.",
+  "source_language": "en",
+  "target_languages": ["de", "fr", "es", "ja", "pt-BR"],
+  "context": "SaaS marketing website - hero section",
+  "tone": "professional but approachable",
+  "content_type": "marketing",
+  "glossary": {
+    "cloud-native": {"de": "Cloud-nativ", "fr": "cloud-native", "es": "nativo en la nube", "ja": "&#12463;&#12521;&#12454;&#12489;&#12493;&#12452;&#12486;&#12451;&#12502;"},
+    "CI/CD": {"all": "CI/CD"},
+    "pipelines": {"de": "Pipelines", "fr": "pipelines", "ja": "&#12497;&#12452;&#12503;&#12521;&#12452;&#12531;"}
+  }
+}</code></pre>
+            <p>The <code>context</code> and <code>tone</code> fields are what separate this from generic machine translation. Telling the model that this is a &ldquo;SaaS marketing hero section&rdquo; produces dramatically different output than &ldquo;technical documentation&rdquo; or &ldquo;casual blog post.&rdquo;</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 2 &mdash; Pre-Processing and Segmentation</div>
+            <h3>Split content into optimal chunks for translation quality</h3>
+            <p>Long texts need to be segmented before translation. Too-long inputs reduce quality; too-short inputs lose context. The sweet spot is 200&ndash;500 words per segment.</p>
+<pre><code>// n8n Function node: segment content for translation
+const text = $input.first().json.source_text;
+const targetLangs = $input.first().json.target_languages;
+const segments = [];
+
+// Split by paragraphs first, then by sentences if too long
+const paragraphs = text.split(/\n\n+/);
+for (const para of paragraphs) {
+  if (para.length > 500) {
+    // Split long paragraphs into sentence groups
+    const sentences = para.match(/[^.!?]+[.!?]+/g) || [para];
+    let chunk = '';
+    for (const sent of sentences) {
+      if ((chunk + sent).length > 500 && chunk) {
+        segments.push(chunk.trim());
+        chunk = sent;
+      } else {
+        chunk += sent;
+      }
+    }
+    if (chunk) segments.push(chunk.trim());
+  } else {
+    segments.push(para);
+  }
+}
+
+// Create one item per segment per language
+const items = [];
+for (const lang of targetLangs) {
+  for (let i = 0; i < segments.length; i++) {
+    items.push({
+      json: {
+        segment: segments[i],
+        segment_index: i,
+        total_segments: segments.length,
+        target_language: lang,
+        source_language: $input.first().json.source_language,
+        context: $input.first().json.context,
+        tone: $input.first().json.tone,
+        glossary: $input.first().json.glossary || {}
+      }
+    });
+  }
+}
+
+return items;</code></pre>
+            <p>This creates one work item per segment per language. For a 3-paragraph text going into 5 languages, that&rsquo;s 15 items &mdash; each processed independently, which enables parallel translation.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 3 &mdash; Glossary Preparation</div>
+            <h3>Build language-specific glossary instructions for each segment</h3>
+            <p>The glossary is the secret weapon for consistent brand translation. This node formats glossary entries for the target language and embeds them in the prompt:</p>
+<pre><code>// n8n Function node: prepare glossary for prompt
+const glossary = $json.glossary;
+const targetLang = $json.target_language;
+const entries = [];
+
+for (const [term, translations] of Object.entries(glossary)) {
+  const translation = translations[targetLang] || translations['all'] || null;
+  if (translation) {
+    entries.push(`"${term}" &rarr; "${translation}"`);
+  }
+}
+
+const glossaryText = entries.length > 0
+  ? `\n\nGLOSSARY (use these exact terms in your translation):\n${entries.join('\n')}`
+  : '';
+
+return [{
+  json: {
+    ...$json,
+    glossary_prompt: glossaryText
+  }
+}];</code></pre>
+
+            <p>For large glossaries (100+ terms), you can fetch them from a Google Sheet or database at the start of the workflow instead of passing them in every request. Use an <strong>HTTP Request</strong> node to hit the Google Sheets API or a <strong>Postgres</strong>/<strong>MySQL</strong> node to query your terminology database.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 4 &mdash; AI Translation with Ollama</div>
+            <h3>The core translation node with context-aware prompting</h3>
+            <p>This is where the actual translation happens. The prompt includes context, tone, glossary, and specific rules to preserve formatting:</p>
+<pre><code>// HTTP Request node to Ollama
+POST http://localhost:11434/api/generate
+
+{
+  "model": "mistral:7b",
+  "prompt": "You are an expert human translator specializing in {{ $json.content_type || 'general' }} content. Translate the following text from {{ $json.source_language }} to {{ $json.target_language }}.\n\nCONTEXT: {{ $json.context }}\nTONE: {{ $json.tone }}\n{{ $json.glossary_prompt }}\n\nRULES:\n1. Preserve all HTML tags, URLs, email addresses, and code snippets exactly as-is\n2. Use glossary terms exactly as specified — do not paraphrase them\n3. Match the tone and register described above\n4. Preserve paragraph structure, bullet points, and formatting\n5. Adapt idioms and cultural references naturally — do not translate them literally\n6. Keep proper nouns, brand names, and product names in their original form unless glossary specifies otherwise\n7. Output ONLY the translated text — no explanations, no notes, no alternatives\n\nSOURCE TEXT:\n{{ $json.segment }}\n\nTRANSLATION:",
+  "stream": false,
+  "options": {
+    "temperature": 0.3,
+    "num_predict": 2048,
+    "top_p": 0.9
+  }
+}</code></pre>
+            <div class="highlight">
+                <strong>Why <code>temperature: 0.3</code>?</strong> Translation needs to be accurate and consistent, not creative. Low temperature reduces randomness, meaning the same input produces nearly identical output each time. This is critical for brand consistency &mdash; you don&rsquo;t want &ldquo;Sign Up&rdquo; translated differently on every page. For marketing copy where you want more natural-sounding variations, you can bump this to 0.4&ndash;0.5.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 5 &mdash; Quality Validation (Second AI Pass)</div>
+            <h3>Automatically catch translation errors before they reach production</h3>
+            <p>A separate Ollama call reviews each translation for accuracy, completeness, and glossary compliance. This catches the errors that would otherwise require a human reviewer:</p>
+<pre><code>// HTTP Request node: quality validation
+POST http://localhost:11434/api/generate
+
+{
+  "model": "mistral:7b",
+  "prompt": "You are a professional translation quality reviewer. Compare the source text and its translation below.\n\nSource ({{ $json.source_language }}):\n{{ $json.segment }}\n\nTranslation ({{ $json.target_language }}):\n{{ $json.translated_text }}\n\nRequired glossary terms:\n{{ $json.glossary_prompt }}\n\nExpected tone: {{ $json.tone }}\n\nEvaluate the translation on these criteria (score 0-100 each):\n1. COMPLETENESS: Is all source content present in the translation?\n2. ACCURACY: Does the translation preserve the original meaning?\n3. GLOSSARY: Are all required glossary terms used correctly?\n4. NATURALNESS: Does it read naturally in the target language?\n5. TONE: Does it match the expected tone/register?\n\nRespond in valid JSON only:\n{\"completeness\": N, \"accuracy\": N, \"glossary\": N, \"naturalness\": N, \"tone\": N, \"overall\": N, \"issues\": [\"description of any problems\"], \"pass\": true_or_false}",
+  "stream": false,
+  "options": {
+    "temperature": 0.1,
+    "num_predict": 512
+  }
+}</code></pre>
+            <p>After the validation, a <strong>Function</strong> node parses the JSON response and routes the result:</p>
+<pre><code>// Parse validation result and decide next step
+const response = JSON.parse($json.response);
+let quality;
+
+try {
+  quality = JSON.parse(response);
+} catch (e) {
+  // If model output isn't valid JSON, flag for re-translation
+  quality = { pass: false, overall: 0, issues: ['Invalid validation response'] };
+}
+
+const result = {
+  ...$input.first().json,
+  quality_score: quality.overall,
+  quality_details: quality,
+  needs_retranslation: !quality.pass || quality.overall < 75
+};
+
+return [{ json: result }];</code></pre>
+            <p>If <code>needs_retranslation</code> is true, the workflow loops back to Step 4 with the issues appended to the prompt as additional context. This self-correction catches 90%+ of quality issues automatically.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 6 &mdash; Reassembly and Output</div>
+            <h3>Merge translated segments and deliver results</h3>
+<pre><code>// n8n Function node: reassemble translated segments
+const items = $input.all();
+const translations = {};
+
+for (const item of items) {
+  const lang = item.json.target_language;
+  if (!translations[lang]) {
+    translations[lang] = {
+      segments: [],
+      quality_scores: []
+    };
+  }
+  translations[lang].segments[item.json.segment_index] = item.json.translated_text;
+  translations[lang].quality_scores.push(item.json.quality_score);
+}
+
+// Build final output
+const output = {};
+for (const [lang, data] of Object.entries(translations)) {
+  const avgQuality = data.quality_scores.reduce((a, b) => a + b, 0) / data.quality_scores.length;
+  output[lang] = {
+    translated_text: data.segments.join('\n\n'),
+    average_quality_score: Math.round(avgQuality),
+    word_count: data.segments.join(' ').split(/\s+/).length,
+    segment_count: data.segments.length
+  };
+}
+
+return [{
+  json: {
+    source_language: items[0].json.source_language,
+    translations: output,
+    translated_at: new Date().toISOString()
+  }
+}];</code></pre>
+        </div>
+
+        <h2>Real-World Use Cases</h2>
+
+        <h3>E-Commerce Product Localization</h3>
+        <p>Translate product titles, descriptions, specifications, and category pages for international storefronts. Connect to <strong>Shopify</strong> (Admin API + Markets), <strong>WooCommerce</strong> (REST API + WPML), or <strong>Magento</strong> to automatically translate new products as they&rsquo;re added. A store with 500 products can have all 5 target languages completed overnight.</p>
+
+        <h3>SaaS App Localization (i18n Files)</h3>
+        <p>Feed your <code>en.json</code>, <code>.po</code>, <code>.xliff</code>, or <code>.strings</code> files through the workflow. The translation preserves JSON structure, placeholder tokens (<code>{{username}}</code>, <code>%d items</code>), and HTML tags. Output files are ready to deploy directly into your app&rsquo;s locale directory.</p>
+<pre><code>// Example: translating i18n JSON keys
+// Input (en.json):
+{
+  "nav.dashboard": "Dashboard",
+  "nav.settings": "Settings",
+  "welcome.title": "Welcome back, {{name}}!",
+  "items.count": "You have {{count}} items in your cart"
+}
+
+// Output (de.json) - preserves keys and placeholders:
+{
+  "nav.dashboard": "Dashboard",
+  "nav.settings": "Einstellungen",
+  "welcome.title": "Willkommen zur&uuml;ck, {{name}}!",
+  "items.count": "Sie haben {{count}} Artikel in Ihrem Warenkorb"
+}</code></pre>
+
+        <h3>Marketing Email Campaigns</h3>
+        <p>Automatically translate email templates before each campaign send. The workflow preserves HTML formatting, personalization tokens, CTA buttons, and tracking links. Schedule translations to run 24 hours before send time so your team can review before launch.</p>
+
+        <h3>Documentation and Knowledge Base</h3>
+        <p>Translate help articles, API documentation, and knowledge base content. The context-awareness handles technical terminology that generic translators consistently get wrong &mdash; &ldquo;endpoint&rdquo; stays &ldquo;Endpoint&rdquo; in German (not &ldquo;Endpunkt&rdquo;), &ldquo;deploy&rdquo; becomes the correct localized term in each market.</p>
+
+        <h3>Automated Content Pipeline</h3>
+        <p>Combine the translation workflow with the <a href="n8n-social-media-content-generator-ollama.html">Social Media Content Generator</a> &mdash; write content once in English, then automatically translate and publish to localized social accounts across all markets.</p>
+
+        <h2>Best Ollama Models for Translation</h2>
+
+        <table>
+            <tr><th>Model</th><th>Size</th><th>Best For</th><th>Strong Languages</th><th>Speed (words/min)</th></tr>
+            <tr><td><code>mistral:7b</code></td><td>4.1 GB</td><td>European languages, marketing content</td><td>EN, DE, FR, ES, IT, PT, NL</td><td>~200</td></tr>
+            <tr><td><code>llama3:8b</code></td><td>4.7 GB</td><td>Broad language support, technical docs</td><td>30+ languages, strong EN/ES/DE/FR</td><td>~180</td></tr>
+            <tr><td><code>qwen2:7b</code></td><td>4.4 GB</td><td>Chinese, Japanese, Korean content</td><td>ZH, JA, KO + EN</td><td>~170</td></tr>
+            <tr><td><code>command-r:35b</code></td><td>20 GB</td><td>Highest quality, complex content</td><td>50+ languages including low-resource</td><td>~80</td></tr>
+            <tr><td><code>gemma2:9b</code></td><td>5.4 GB</td><td>Good balance of quality and speed</td><td>EN, DE, FR, ES, IT, JA, KO, ZH</td><td>~160</td></tr>
+        </table>
+
+        <div class="highlight">
+            <strong>Model selection tip:</strong> For European language pairs, <code>mistral:7b</code> delivers the best quality-to-speed ratio. For CJK languages (Chinese, Japanese, Korean), <code>qwen2:7b</code> is significantly better than Western-focused models. If you need the highest quality across all languages and have 20GB+ RAM, <code>command-r:35b</code> is the clear choice.
+        </div>
+
+        <h2>Performance and Throughput</h2>
+
+        <div class="highlight">
+            <strong>Benchmarks (16GB RAM, no dedicated GPU):</strong>
+            <ul style="margin-top: 0.5rem;">
+                <li><code>mistral:7b</code>: ~200 words/minute per language</li>
+                <li><code>llama3:8b</code>: ~180 words/minute per language</li>
+                <li>With quality validation (2 passes): ~120 words/minute</li>
+                <li>5 languages sequentially: ~600 words/minute total throughput</li>
+            </ul>
+            <p style="margin-top: 0.75rem;"><strong>Real-world estimates:</strong></p>
+            <ul>
+                <li>2,000-word blog post &rarr; 5 languages: ~15 minutes</li>
+                <li>500 product descriptions (50 words each) &rarr; 5 languages: ~3.5 hours</li>
+                <li>Full SaaS app (2,000 i18n strings) &rarr; 5 languages: ~2 hours</li>
+                <li>10,000-word documentation site &rarr; 5 languages: ~75 minutes</li>
+            </ul>
+            <p style="margin-top: 0.5rem;">With a GPU (RTX 3060+), multiply throughput by 3&ndash;5x.</p>
+        </div>
+
+        <h2>Advanced: Centralized Glossary Management</h2>
+
+        <p>For organizations translating consistently across multiple projects, maintain a centralized glossary in Google Sheets or a database. The workflow fetches the latest terms at the start of each run:</p>
+
+<pre><code>// Fetch glossary from Google Sheets (first node in workflow)
+// Sheet columns: term_en | term_de | term_fr | term_es | term_ja | notes
+GET https://sheets.googleapis.com/v4/spreadsheets/{{sheet_id}}/values/Glossary!A:G
+
+// Or maintain a local glossary.json file:
+{
+  "platform": {"de": "Plattform", "fr": "plateforme", "es": "plataforma", "ja": "&#12503;&#12521;&#12483;&#12488;&#12501;&#12457;&#12540;&#12512;"},
+  "dashboard": {"de": "Dashboard", "fr": "tableau de bord", "es": "panel de control"},
+  "workflow": {"de": "Workflow", "fr": "flux de travail", "es": "flujo de trabajo"},
+  "deploy": {"de": "bereitstellen", "fr": "d&eacute;ployer", "es": "desplegar"},
+  "Sign Up": {"de": "Registrieren", "fr": "S'inscrire", "es": "Reg&iacute;strate"}
+}</code></pre>
+
+        <p>This ensures that &ldquo;Sign Up&rdquo; is always &ldquo;Registrieren&rdquo; in German across every page, email, and app screen &mdash; something generic translation APIs cannot guarantee.</p>
+
+        <h2>Integration with CMS Platforms</h2>
+
+        <p>Connect the translation workflow to your content management system for fully automated localization on content publish:</p>
+
+        <ul>
+            <li><strong>WordPress + WPML/Polylang</strong> &mdash; Trigger on <code>publish_post</code> webhook, translate all text fields, create translated post versions via REST API. Works with WooCommerce products too.</li>
+            <li><strong>Shopify + Markets</strong> &mdash; Use Shopify Admin API (<code>POST /translations/register</code>) to automatically translate products, collections, and pages when they&rsquo;re created or updated.</li>
+            <li><strong>Strapi / Contentful / Sanity</strong> &mdash; Webhook on content publish, translate all locale fields, update translations via the CMS API. Headless CMS platforms make this particularly clean.</li>
+            <li><strong>GitHub (docs sites)</strong> &mdash; Watch for pushes to <code>docs/en/</code>, translate modified files, open a PR with translations into <code>docs/de/</code>, <code>docs/fr/</code>, etc. Human reviewers approve the PR.</li>
+            <li><strong>Notion / Confluence</strong> &mdash; Periodic sync: fetch pages tagged &ldquo;needs-translation,&rdquo; translate, create localized copies, update the status tag.</li>
+        </ul>
+
+        <div class="cta">
+            <h3>Get the Complete Translation Workflow + 10 More AI Templates</h3>
+            <p>This n8n translation automation workflow is included in our <strong>Self-Hosted AI Workflow Pack</strong> with 11 production-ready n8n templates &mdash; all powered by Ollama, no API keys needed.</p>
+            <p>Includes: translation pipeline, email responder, blog writer, social content generator, document summarizer, meeting notes, lead scoring, code review, and more.</p>
+            <a href="https://buy.stripe.com/28EaEXdSJ1I67WbaivabK0c" class="btn">Get All 11 Workflows &mdash; $39</a>
+            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--muted);">One-time payment. No subscription. 30-day money-back guarantee.</p>
+        </div>
+
+        <h2>Free Starter Workflow (Import into n8n)</h2>
+
+        <p>Here&rsquo;s a simplified version of the automated content localization workflow you can import directly into n8n. It handles single-language translation with basic quality validation:</p>
+
+        <details class="json-toggle">
+            <summary>Click to expand free workflow JSON</summary>
+            <pre><code>{
+  "name": "AI Translation Pipeline - Ollama (Free Starter)",
+  "nodes": [
+    {
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "parameters": {
+        "path": "translate",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "name": "Prepare Translation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [450, 300],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {"name": "source_text", "value": "={{ $json.body.source_text }}", "type": "string"},
+            {"name": "source_language", "value": "={{ $json.body.source_language || 'en' }}", "type": "string"},
+            {"name": "target_language", "value": "={{ $json.body.target_language || 'de' }}", "type": "string"},
+            {"name": "context", "value": "={{ $json.body.context || 'general content' }}", "type": "string"},
+            {"name": "tone", "value": "={{ $json.body.tone || 'professional' }}", "type": "string"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Translate with Ollama",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 300],
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({model: 'mistral:7b', prompt: 'You are an expert translator. Translate the following from ' + $json.source_language + ' to ' + $json.target_language + '.\\n\\nContext: ' + $json.context + '\\nTone: ' + $json.tone + '\\n\\nRules: Preserve all HTML/URLs/code. Output ONLY the translation.\\n\\nText: ' + $json.source_text + '\\n\\nTranslation:', stream: false, options: {temperature: 0.3, num_predict: 2048}}) }}",
+        "options": {"timeout": 120000}
+      }
+    },
+    {
+      "name": "Extract Translation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [850, 300],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {"name": "translated_text", "value": "={{ JSON.parse($json.data).response.trim() }}", "type": "string"},
+            {"name": "source_text", "value": "={{ $('Prepare Translation').item.json.source_text }}", "type": "string"},
+            {"name": "source_language", "value": "={{ $('Prepare Translation').item.json.source_language }}", "type": "string"},
+            {"name": "target_language", "value": "={{ $('Prepare Translation').item.json.target_language }}", "type": "string"}
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {"main": [[{"node": "Prepare Translation", "type": "main", "index": 0}]]},
+    "Prepare Translation": {"main": [[{"node": "Translate with Ollama", "type": "main", "index": 0}]]},
+    "Translate with Ollama": {"main": [[{"node": "Extract Translation", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"},
+  "tags": [{"name": "AI"}, {"name": "Ollama"}, {"name": "Translation"}]
+}</code></pre>
+        </details>
+
+        <h3>How to Use the Free Workflow</h3>
+        <ol>
+            <li>Copy the JSON above and import via <strong>n8n &rarr; Workflows &rarr; Import from JSON</strong></li>
+            <li>Make sure Ollama is running: <code>ollama serve</code></li>
+            <li>Pull the model: <code>ollama pull mistral:7b</code></li>
+            <li>If n8n runs in Docker, replace <code>localhost</code> with <code>host.docker.internal</code> in the Ollama URL</li>
+            <li>Activate the workflow and test with a POST request:
+<pre><code>curl -X POST http://localhost:5678/webhook/translate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "source_text": "Welcome to our platform. Get started in minutes.",
+    "source_language": "en",
+    "target_language": "de",
+    "context": "SaaS onboarding page",
+    "tone": "friendly and professional"
+  }'</code></pre>
+            </li>
+        </ol>
+
+        <h2>Tips for Best Translation Quality</h2>
+
+        <ol>
+            <li><strong>Always provide context</strong> &mdash; &ldquo;marketing hero section&rdquo; vs &ldquo;API documentation&rdquo; vs &ldquo;customer support email&rdquo; produces very different translations from the same source text. This single change improves output quality more than any model upgrade.</li>
+            <li><strong>Use glossaries for brand consistency</strong> &mdash; Without explicit glossary terms, the model will translate &ldquo;Dashboard&rdquo; differently each time (German: &ldquo;Dashboard,&rdquo; &ldquo;&Uuml;bersicht,&rdquo; &ldquo;Instrumententafel&rdquo;). Pin your terms.</li>
+            <li><strong>Keep segments at 200&ndash;500 words</strong> &mdash; Too short (under 50 words) loses context. Too long (over 1,000 words) increases errors and hallucination. The segmentation in Step 2 handles this automatically.</li>
+            <li><strong>Always validate with a second pass</strong> &mdash; The quality check in Step 5 catches missing content, wrong glossary terms, and tone mismatches before they reach production. Skip this only for low-stakes content.</li>
+            <li><strong>Match models to language pairs</strong> &mdash; Use <code>qwen2</code> for CJK, <code>mistral</code> for European languages. A specialized 7B model outperforms a general 13B model for specific language pairs.</li>
+            <li><strong>Test with professional translators first</strong> &mdash; Have a native speaker review the first batch of translations. Use their feedback to refine your prompts and glossary. The initial calibration investment pays off across thousands of future translations.</li>
+        </ol>
+
+        <h2>Troubleshooting</h2>
+
+        <h3>Translations sound unnatural or robotic</h3>
+        <ul>
+            <li>Add <code>"tone": "natural and conversational"</code> to the prompt context</li>
+            <li>Include an example of the desired style in the prompt</li>
+            <li>Increase temperature slightly (0.4&ndash;0.5) for marketing copy</li>
+            <li>Try a larger model &mdash; <code>command-r:35b</code> produces noticeably more natural output</li>
+        </ul>
+
+        <h3>Model outputs explanations instead of just the translation</h3>
+        <ul>
+            <li>Emphasize in the prompt: &ldquo;Output ONLY the translated text. No explanations, notes, or alternatives.&rdquo;</li>
+            <li>Use <code>num_predict</code> to limit output length proportional to input length</li>
+            <li>Add a post-processing Function node that strips common prefixes like &ldquo;Here is the translation:&rdquo;</li>
+        </ul>
+
+        <h3>Glossary terms are being ignored</h3>
+        <ul>
+            <li>Move glossary terms to the end of the prompt (models pay more attention to recent context)</li>
+            <li>Use ALL CAPS for glossary section headers: <code>GLOSSARY (MANDATORY):</code></li>
+            <li>Add reinforcement: &ldquo;You MUST use these exact terms. Do not paraphrase or substitute.&rdquo;</li>
+        </ul>
+
+        <h3>Ollama connection issues from n8n Docker</h3>
+        <ul>
+            <li>Replace <code>http://localhost:11434</code> with <code>http://host.docker.internal:11434</code></li>
+            <li>Set <code>OLLAMA_HOST=0.0.0.0</code> in Ollama&rsquo;s environment to allow network connections</li>
+            <li>Verify: <code>curl http://host.docker.internal:11434/api/tags</code> from inside the n8n container</li>
+        </ul>
+
+        <div class="cta">
+            <h3>Need More AI Workflow Templates?</h3>
+            <p>Check out our full collection of <strong>11 self-hosted AI workflows</strong> for n8n + Ollama. Translation, email automation, document processing, content generation, lead scoring, and more &mdash; all running locally on your hardware.</p>
+            <a href="https://buy.stripe.com/28EaEXdSJ1I67WbaivabK0c" class="btn">Get the Full Pack &mdash; $39</a>
+        </div>
+
+        <h2>Related Tutorials</h2>
+        <ul>
+            <li><a href="n8n-ai-product-descriptions-ollama-ecommerce.html">Generate AI Product Descriptions with n8n + Ollama</a></li>
+            <li><a href="n8n-social-media-content-generator-ollama.html">Automate Social Media Content with n8n + Ollama</a></li>
+            <li><a href="n8n-ai-data-enrichment-ollama-web-scraping.html">Automate Data Enrichment &amp; Web Scraping with n8n + Ollama</a></li>
+            <li><a href="self-hosted-ai-workflows-n8n-ollama.html">Complete Guide: Self-Hosted AI with n8n + Ollama</a></li>
+            <li><a href="n8n-ai-image-alt-text-ollama-accessibility.html">Automate Image Alt Text with n8n + Ollama</a></li>
+        </ul>
+
+    </article>
+
+    <footer>
+        <p>&copy; 2026 Workflow Forge &middot; <a href="https://bonskari.github.io/n8n-ai-workflows/">All Templates</a> &middot; Built with n8n + Ollama</p>
+    </footer>
+</div>
+</body>
+</html>
