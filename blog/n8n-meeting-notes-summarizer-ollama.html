@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build an AI Meeting Notes Summarizer with n8n + Ollama (Free Workflow)</title>
+    <meta name="description" content="Automatically summarize meeting transcripts with n8n and Ollama. Extract action items, decisions, and follow-ups. Free workflow template. Runs locally, no API costs.">
+    <meta property="og:title" content="AI Meeting Notes Summarizer with n8n + Ollama — Free Workflow">
+    <meta property="og:description" content="Turn messy meeting transcripts into structured summaries with action items. Free n8n workflow using local AI. No API keys needed.">
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="https://bonskari.github.io/n8n-ai-workflows/blog/n8n-meeting-notes-summarizer-ollama.html">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Build an AI Meeting Notes Summarizer with n8n + Ollama (Free Workflow)",
+        "description": "Automatically summarize meeting transcripts with n8n and Ollama. Extract action items and decisions. Free workflow template.",
+        "author": {"@type": "Organization", "name": "Workflow Forge"},
+        "datePublished": "2026-03-24",
+        "publisher": {"@type": "Organization", "name": "Workflow Forge"}
+    }
+    </script>
+    <style>
+        :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --orange: #d29922; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+        .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav { padding: 1rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; line-height: 1.3; }
+        h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; color: var(--accent); }
+        h3 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; }
+        .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1rem 0 1.5rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; }
+        code { font-family: 'SF Mono', 'Fira Code', monospace; }
+        p code, li code { background: var(--surface); border: 1px solid var(--border); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.88em; }
+        ul, ol { margin: 0 0 1rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .cta { background: linear-gradient(135deg, #1a3a5c, #1a2d4a); border: 1px solid var(--accent); border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center; }
+        .cta h3 { color: var(--accent); margin-top: 0; }
+        .cta a.btn { display: inline-block; background: var(--accent); color: #000; padding: 0.75rem 2rem; border-radius: 8px; font-weight: bold; text-decoration: none; margin-top: 1rem; }
+        .cta a.btn:hover { opacity: 0.9; text-decoration: none; }
+        .highlight { background: var(--surface); border-left: 3px solid var(--accent); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
+        th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; }
+        th { background: var(--surface); }
+        .step { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+        .step-number { color: var(--accent); font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .json-toggle { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin: 1.5rem 0; }
+        .json-toggle summary { cursor: pointer; padding: 1rem 1.25rem; font-weight: 600; color: var(--accent); }
+        .json-toggle summary:hover { background: rgba(88,166,255,0.05); }
+        .json-toggle pre { margin: 0; border: none; border-top: 1px solid var(--border); border-radius: 0 0 8px 8px; max-height: 500px; overflow-y: auto; }
+        footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
+        @media (max-width: 600px) { h1 { font-size: 1.6rem; } .cta { padding: 1.5rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav><a href="https://bonskari.github.io/n8n-ai-workflows/">&larr; n8n AI Workflow Templates</a> &middot; <a href="https://bonskari.github.io/n8n-ai-workflows/blog/">Blog</a></nav>
+
+    <article>
+        <h1>Build an AI Meeting Notes Summarizer with n8n + Ollama</h1>
+        <p class="meta">Published March 24, 2026 &middot; 9 min read</p>
+
+        <p>After every meeting, someone has to turn a messy transcript into structured notes with action items. It takes 15&ndash;30 minutes per meeting. For a team with 5 meetings per day, that's over 10 hours per week spent on meeting notes.</p>
+
+        <p>In this tutorial, you'll build an n8n workflow that does this automatically using Ollama &mdash; local AI, zero API costs, your data stays on your machine.</p>
+
+        <h2>What the Workflow Does</h2>
+
+        <ol>
+            <li><strong>Receives a meeting transcript</strong> via webhook (paste from Zoom, Teams, Google Meet, or Otter.ai)</li>
+            <li><strong>Generates a structured summary</strong> with key decisions and discussion points</li>
+            <li><strong>Extracts action items</strong> with owner and deadline for each</li>
+            <li><strong>Drafts a follow-up email</strong> ready to send to attendees</li>
+            <li><strong>Returns everything</strong> as a clean JSON response</li>
+        </ol>
+
+        <div class="highlight">
+            <p><strong>Works with any transcript source:</strong> Zoom's auto-transcription, Google Meet captions, Otter.ai exports, Microsoft Teams transcripts, or even manually typed notes. If it's text, this workflow can summarize it.</p>
+        </div>
+
+        <h2>Why Local AI for Meeting Notes?</h2>
+
+        <p>Meeting transcripts contain some of the most sensitive business data: strategy discussions, financial plans, HR decisions, client negotiations. Sending this to OpenAI or Google's APIs means your internal conversations leave your infrastructure.</p>
+
+        <table>
+            <tr><th>Concern</th><th>Cloud AI (GPT-4, Claude API)</th><th>Local AI (Ollama)</th></tr>
+            <tr><td>Data privacy</td><td>Transcripts sent to third-party</td><td>Never leaves your server</td></tr>
+            <tr><td>Cost per meeting</td><td>$0.05&ndash;0.50 (depends on length)</td><td>$0</td></tr>
+            <tr><td>GDPR compliance</td><td>Requires DPA with provider</td><td>Compliant by default</td></tr>
+            <tr><td>Rate limits</td><td>Yes &mdash; problematic at scale</td><td>None</td></tr>
+            <tr><td>Works offline</td><td>No</td><td>Yes</td></tr>
+        </table>
+
+        <p>For meeting summarization, a local 8B-parameter model is more than capable. The task is well-defined: extract key information from text and organize it. No creative reasoning needed.</p>
+
+        <h2>Prerequisites</h2>
+
+        <pre><code># Install Ollama + model
+curl -fsSL https://ollama.ai/install.sh | sh
+ollama pull llama3:8b
+
+# Run n8n
+docker run -d --name n8n -p 5678:5678 \
+  --add-host=host.docker.internal:host-gateway \
+  -v n8n_data:/home/node/.n8n \
+  n8nio/n8n</code></pre>
+
+        <h2>Free Workflow: Meeting Notes Summarizer</h2>
+
+        <p>This workflow processes a meeting transcript through two AI stages: summarization and action item extraction. Both run locally via Ollama.</p>
+
+        <div class="step">
+            <div class="step-number">STAGE 1: Summarize</div>
+            <p>The transcript is sent to Ollama with a prompt that extracts: meeting purpose, key decisions, discussion highlights, and open questions. Output is structured markdown.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STAGE 2: Extract Action Items</div>
+            <p>A second Ollama call focuses specifically on action items. It identifies: what needs to be done, who is responsible, and suggested deadlines. Output is JSON for easy integration.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STAGE 3: Draft Follow-up Email</div>
+            <p>Using the summary and action items, a third call drafts a professional follow-up email ready to send to meeting attendees.</p>
+        </div>
+
+        <h3>The Workflow JSON</h3>
+
+        <details class="json-toggle">
+            <summary>Click to expand full workflow JSON</summary>
+            <pre><code>{
+  "name": "AI Meeting Notes Summarizer (Ollama)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "summarize-meeting",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Receive Transcript",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "summarize-meeting"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3:8b', prompt: 'You are an expert meeting summarizer. Analyze this meeting transcript and produce a structured summary.\\n\\nMeeting: ' + ($json.body.title || 'Untitled Meeting') + '\\nAttendees: ' + ($json.body.attendees || 'Not specified') + '\\n\\nTranscript:\\n' + ($json.body.transcript || '').substring(0, 4000) + '\\n\\nProduce a summary in this EXACT format:\\n\\n## Summary\\n[2-3 sentence overview of the meeting]\\n\\n## Key Decisions\\n- [Decision 1]\\n- [Decision 2]\\n\\n## Discussion Highlights\\n- [Point 1]\\n- [Point 2]\\n\\n## Open Questions\\n- [Question 1]\\n\\nBe concise. Focus on what matters.', stream: false, options: { temperature: 0.3, num_predict: 1000 } }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "summarize",
+      "name": "Summarize Meeting (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3:8b', prompt: 'Extract ALL action items from this meeting transcript. For each action item, identify who is responsible and suggest a deadline.\\n\\nTranscript:\\n' + ($json.body.transcript || '').substring(0, 4000) + '\\n\\nRespond in this EXACT JSON format, nothing else:\\n{\"action_items\": [{\"task\": \"description\", \"owner\": \"person name or Unknown\", \"deadline\": \"suggested date or ASAP\", \"priority\": \"high|medium|low\"}]}', stream: false, options: { temperature: 0.2, num_predict: 800 } }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "extract-actions",
+      "name": "Extract Action Items (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 420]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "summary",
+              "name": "summary",
+              "value": "={{ JSON.parse($('Summarize Meeting (Ollama)').item.json.data).response }}",
+              "type": "string"
+            },
+            {
+              "id": "action_items",
+              "name": "action_items",
+              "value": "={{ JSON.parse($('Extract Action Items (Ollama)').item.json.data).response }}",
+              "type": "string"
+            },
+            {
+              "id": "title",
+              "name": "title",
+              "value": "={{ $('Receive Transcript').item.json.body.title || 'Meeting Summary' }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "combine",
+      "name": "Combine Results",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3:8b', prompt: 'Write a professional follow-up email for this meeting.\\n\\nMeeting: ' + $json.title + '\\nAttendees: ' + ($('Receive Transcript').item.json.body.attendees || 'team') + '\\n\\nSummary:\\n' + $json.summary + '\\n\\nAction Items:\\n' + $json.action_items + '\\n\\nWrite a concise, professional email that:\\n1. Thanks attendees\\n2. Lists key decisions\\n3. Lists action items with owners\\n4. Mentions next steps\\n\\nWrite ONLY the email body. Start with \"Hi everyone,\"', stream: false, options: { temperature: 0.4, num_predict: 800 } }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "draft-email",
+      "name": "Draft Follow-up Email (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ title: $('Combine Results').item.json.title, summary: $('Combine Results').item.json.summary, action_items: (() => { try { return JSON.parse($('Combine Results').item.json.action_items) } catch(e) { return { raw: $('Combine Results').item.json.action_items } } })(), follow_up_email: JSON.parse($json.data).response }) }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Return Results",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Receive Transcript": {
+      "main": [[
+        { "node": "Summarize Meeting (Ollama)", "type": "main", "index": 0 },
+        { "node": "Extract Action Items (Ollama)", "type": "main", "index": 0 }
+      ]]
+    },
+    "Summarize Meeting (Ollama)": {
+      "main": [[{ "node": "Combine Results", "type": "main", "index": 0 }]]
+    },
+    "Extract Action Items (Ollama)": {
+      "main": [[{ "node": "Combine Results", "type": "main", "index": 0 }]]
+    },
+    "Combine Results": {
+      "main": [[{ "node": "Draft Follow-up Email (Ollama)", "type": "main", "index": 0 }]]
+    },
+    "Draft Follow-up Email (Ollama)": {
+      "main": [[{ "node": "Return Results", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "AI" }, { "name": "Ollama" }, { "name": "Productivity" }, { "name": "Meeting Notes" }]
+}</code></pre>
+        </details>
+
+        <h3>Testing the Workflow</h3>
+
+        <pre><code>curl -X POST http://localhost:5678/webhook/summarize-meeting \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Q2 Product Planning",
+    "attendees": "Sarah (PM), Mike (Engineering), Lisa (Design)",
+    "transcript": "Sarah: Okay, lets kick off Q2 planning. Mike, wheres the API rewrite at? Mike: Were about 70% done. Should be ready for internal testing by April 10th. The main blocker is the auth migration - we need to decide if we go OAuth2 or stick with API keys. Sarah: Lets go OAuth2. Its what enterprise customers keep asking for. Lisa, can you have the new dashboard mockups ready by April 5th? Lisa: Yes, I can do that. But I need the API spec from Mike first to know what data endpoints are available. Mike: Ill send that over by end of this week. Sarah: Perfect. Also, we need to discuss the pricing change. Were moving from $29 to $39 for the pro plan starting May 1st. Existing customers keep their current price for 6 months. Lisa: Should I update the pricing page? Sarah: Yes, but not until April 25th. We want to announce it in the April newsletter first. Mike: What about the mobile app? Sarah: Pushed to Q3. We dont have the bandwidth with the API rewrite. Lets focus and ship what we have."
+  }'</code></pre>
+
+        <p>Expected response (abbreviated):</p>
+
+        <pre><code>{
+  "title": "Q2 Product Planning",
+  "summary": "## Summary\nThe team discussed Q2 priorities...\n\n## Key Decisions\n- Moving to OAuth2 for authentication\n- Price increase from $29 to $39 (May 1st)\n- Mobile app pushed to Q3\n...",
+  "action_items": {
+    "action_items": [
+      {
+        "task": "Send API spec to Lisa",
+        "owner": "Mike",
+        "deadline": "End of this week",
+        "priority": "high"
+      },
+      {
+        "task": "Complete dashboard mockups",
+        "owner": "Lisa",
+        "deadline": "April 5th",
+        "priority": "high"
+      },
+      {
+        "task": "Update pricing page",
+        "owner": "Lisa",
+        "deadline": "April 25th",
+        "priority": "medium"
+      }
+    ]
+  },
+  "follow_up_email": "Hi everyone,\n\nThanks for a productive Q2 planning session..."
+}</code></pre>
+
+        <h2>How the Prompts Work</h2>
+
+        <h3>Summarization Prompt Strategy</h3>
+        <p>The summary prompt uses a <strong>fixed output template</strong> (## Summary, ## Key Decisions, etc.). This forces the model to organize information into consistent sections rather than free-form text. The <code>temperature: 0.3</code> keeps output focused without being repetitive.</p>
+
+        <h3>Action Item Extraction</h3>
+        <p>Action items require the most precise output. The prompt asks for JSON with specific fields (<code>task</code>, <code>owner</code>, <code>deadline</code>, <code>priority</code>). At <code>temperature: 0.2</code>, the model is highly deterministic &mdash; critical when downstream systems need to parse the output.</p>
+
+        <h3>Why Three Separate Calls?</h3>
+        <p>Splitting into three focused prompts (summarize, extract actions, draft email) produces better results than one massive "do everything" prompt. Each call has a single responsibility, making outputs more reliable and easier to debug.</p>
+
+        <div class="highlight">
+            <p><strong>Performance tip:</strong> The summarize and action-item calls run in <strong>parallel</strong> (both connect directly from the webhook trigger). Only the email draft runs sequentially because it needs both outputs. This cuts total processing time by 30&ndash;40%.</p>
+        </div>
+
+        <h2>Integrating with Your Meeting Tools</h2>
+
+        <h3>Zoom</h3>
+        <p>Enable Zoom's cloud recording transcription. When a recording is processed, use n8n's Zoom trigger to automatically fetch the transcript and pipe it to this workflow.</p>
+
+        <h3>Google Meet</h3>
+        <p>Google Meet saves transcripts to Google Drive as <code>.txt</code> files. Set up a Google Drive trigger in n8n that fires when a new file is added to your Meet transcripts folder.</p>
+
+        <h3>Otter.ai</h3>
+        <p>Otter.ai has a webhook integration. Point it at this workflow's webhook URL and meeting notes are processed within seconds of the meeting ending.</p>
+
+        <h3>Manual Input</h3>
+        <p>No transcription tool? Copy-paste notes from any source into a simple form that POSTs to the webhook. Works with hand-typed notes too &mdash; the AI adapts to any input format.</p>
+
+        <h2>Production Tips</h2>
+
+        <ul>
+            <li><strong>Long transcripts:</strong> The workflow truncates to 4000 characters. For hour-long meetings, add a pre-processing step that splits the transcript into chunks and summarizes each, then combines.</li>
+            <li><strong>Multiple languages:</strong> Llama 3 handles English, Spanish, French, German, and other major languages. The same workflow works for multilingual teams.</li>
+            <li><strong>Storing results:</strong> Add a Google Sheets or PostgreSQL node after the response to build a searchable archive of all meeting summaries.</li>
+            <li><strong>Slack integration:</strong> Add a Slack node that posts the summary + action items to your team channel immediately after processing.</li>
+        </ul>
+
+        <div class="cta">
+            <h3>Want the Advanced Version?</h3>
+            <p>The <strong>Self-Hosted AI Workflow Pack</strong> includes a production meeting summarizer with Slack integration, Google Calendar linking, action item tracking, and 10 more AI workflows &mdash; all running locally with Ollama.</p>
+            <a href="https://buy.stripe.com/28EaEXdSJ1I67WbaivabK0c" class="btn">Get All 11 Workflows &mdash; $39</a>
+            <p style="margin-top: 1rem; color: var(--muted); font-size: 0.85rem;">One-time purchase. No subscriptions. 30-day money-back guarantee.</p>
+        </div>
+
+        <h2>More n8n + Ollama Tutorials</h2>
+        <ul>
+            <li><a href="/n8n-ai-workflows/blog/n8n-ai-lead-scoring-ollama-workflow.html">AI Lead Scoring with n8n + Ollama</a></li>
+            <li><a href="/n8n-ai-workflows/blog/automate-email-responses-n8n-ollama.html">Automate Email Responses with n8n + Ollama</a></li>
+            <li><a href="/n8n-ai-workflows/blog/n8n-social-media-content-generator-ollama.html">Social Media Content Generator with n8n + Ollama</a></li>
+            <li><a href="/n8n-ai-workflows/blog/">All Tutorials</a></li>
+        </ul>
+    </article>
+
+    <footer>
+        <p>&copy; 2026 Workflow Forge. Built with n8n + Ollama.</p>
+    </footer>
+</div>
+</body>
+</html>

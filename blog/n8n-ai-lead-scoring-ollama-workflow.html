@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Build AI Lead Scoring with n8n + Ollama (Free Workflow)</title>
+    <meta name="description" content="Automate lead scoring with n8n and Ollama. Score leads 1-100 using local AI, enrich with company data, auto-route hot leads. Free workflow template included. No API costs.">
+    <meta property="og:title" content="AI Lead Scoring with n8n + Ollama — Free Workflow Template">
+    <meta property="og:description" content="Score incoming leads automatically using local AI. Free n8n workflow that runs 100% on your hardware. No API keys needed.">
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-lead-scoring-ollama-workflow.html">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "How to Build AI Lead Scoring with n8n + Ollama (Free Workflow)",
+        "description": "Automate lead scoring with n8n and Ollama. Score leads 1-100 using local AI. Free workflow template included.",
+        "author": {"@type": "Organization", "name": "Workflow Forge"},
+        "datePublished": "2026-03-24",
+        "publisher": {"@type": "Organization", "name": "Workflow Forge"}
+    }
+    </script>
+    <style>
+        :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --orange: #d29922; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+        .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav { padding: 1rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; line-height: 1.3; }
+        h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; color: var(--accent); }
+        h3 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; }
+        .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1rem 0 1.5rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; }
+        code { font-family: 'SF Mono', 'Fira Code', monospace; }
+        .inline-code { background: var(--surface); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+        p code, li code { background: var(--surface); border: 1px solid var(--border); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.88em; }
+        ul, ol { margin: 0 0 1rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .cta { background: linear-gradient(135deg, #1a3a5c, #1a2d4a); border: 1px solid var(--accent); border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center; }
+        .cta h3 { color: var(--accent); margin-top: 0; }
+        .cta a.btn { display: inline-block; background: var(--accent); color: #000; padding: 0.75rem 2rem; border-radius: 8px; font-weight: bold; text-decoration: none; margin-top: 1rem; }
+        .cta a.btn:hover { opacity: 0.9; text-decoration: none; }
+        .highlight { background: var(--surface); border-left: 3px solid var(--accent); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
+        th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; }
+        th { background: var(--surface); }
+        .step { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+        .step-number { color: var(--accent); font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .json-toggle { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin: 1.5rem 0; }
+        .json-toggle summary { cursor: pointer; padding: 1rem 1.25rem; font-weight: 600; color: var(--accent); }
+        .json-toggle summary:hover { background: rgba(88,166,255,0.05); }
+        .json-toggle pre { margin: 0; border: none; border-top: 1px solid var(--border); border-radius: 0 0 8px 8px; max-height: 500px; overflow-y: auto; }
+        footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
+        @media (max-width: 600px) { h1 { font-size: 1.6rem; } .cta { padding: 1.5rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav><a href="https://bonskari.github.io/n8n-ai-workflows/">&larr; n8n AI Workflow Templates</a> &middot; <a href="https://bonskari.github.io/n8n-ai-workflows/blog/">Blog</a></nav>
+
+    <article>
+        <h1>How to Build AI Lead Scoring with n8n + Ollama (Free Workflow Included)</h1>
+        <p class="meta">Published March 24, 2026 &middot; 10 min read</p>
+
+        <p>Most lead scoring tools charge $50&ndash;300/month and require sending your customer data to external servers. With n8n and Ollama, you can build a lead scoring pipeline that runs entirely on your own hardware &mdash; zero API costs, full data privacy, and unlimited leads.</p>
+
+        <p>In this tutorial, you'll build a webhook-triggered workflow that:</p>
+        <ol>
+            <li>Receives lead data via HTTP webhook</li>
+            <li>Scores the lead 1&ndash;100 using local AI (Ollama)</li>
+            <li>Enriches the lead with AI-generated company insights</li>
+            <li>Routes hot leads (score &gt; 70) for immediate follow-up</li>
+            <li>Returns the scored lead data as a JSON response</li>
+        </ol>
+
+        <h2>Why AI Lead Scoring Matters</h2>
+
+        <p>Manual lead qualification wastes sales time. Your reps spend hours reading form submissions, checking LinkedIn, and guessing which leads are worth pursuing. Most of them aren't.</p>
+
+        <p>AI-powered lead scoring solves this by analyzing every lead the moment it arrives:</p>
+
+        <table>
+            <tr><th>Signal</th><th>What AI Detects</th><th>Impact on Score</th></tr>
+            <tr><td>Business email domain</td><td>Company size, industry from domain</td><td>+15&ndash;25 points</td></tr>
+            <tr><td>Job title</td><td>Decision-maker vs. researcher</td><td>+10&ndash;30 points</td></tr>
+            <tr><td>Message content</td><td>Purchase intent, urgency, budget signals</td><td>+10&ndash;25 points</td></tr>
+            <tr><td>Company context</td><td>Industry fit, team size indicators</td><td>+5&ndash;15 points</td></tr>
+        </table>
+
+        <div class="highlight">
+            <p><strong>Why local AI works here:</strong> Lead scoring is a structured classification task &mdash; exactly what 8B-parameter models excel at. You don't need GPT-4 for this. A well-prompted Llama 3 running on your hardware gives consistent, reliable scores with zero per-request cost.</p>
+        </div>
+
+        <h2>The Architecture</h2>
+
+        <p>The workflow uses a simple but effective pipeline:</p>
+
+        <pre><code>[Webhook: Lead arrives]
+        |
+        v
+[Ollama: Score lead 1-100]
+        |
+        v
+[Ollama: Enrich with company insights]
+        |
+        v
+[Switch: Route by score]
+   /        \
+  v          v
+[Hot Lead]  [Nurture]
+(score>70)  (score<=70)</code></pre>
+
+        <p>Two Ollama calls per lead, each taking 2&ndash;5 seconds on modest hardware. For a business processing 50 leads/day, that's under 10 minutes of total compute time.</p>
+
+        <h2>Prerequisites</h2>
+
+        <p>You need n8n and Ollama installed. If you haven't set these up yet, here's the quick version:</p>
+
+        <pre><code># Install Ollama + pull model
+curl -fsSL https://ollama.ai/install.sh | sh
+ollama pull llama3:8b
+
+# Run n8n in Docker
+docker run -d --name n8n -p 5678:5678 \
+  --add-host=host.docker.internal:host-gateway \
+  -v n8n_data:/home/node/.n8n \
+  n8nio/n8n</code></pre>
+
+        <div class="highlight">
+            <p><strong>Docker users:</strong> Use <code>http://host.docker.internal:11434</code> for Ollama URLs in your workflows. If n8n runs natively (not Docker), use <code>http://localhost:11434</code>.</p>
+        </div>
+
+        <h2>Free Workflow: AI Lead Scorer</h2>
+
+        <p>Here's a complete, working n8n workflow. Import the JSON directly into your n8n instance.</p>
+
+        <h3>What It Does</h3>
+
+        <div class="step">
+            <div class="step-number">STEP 1: Webhook Trigger</div>
+            <p>Exposes a <code>POST /webhook/score-lead</code> endpoint. Send lead data as JSON with fields like <code>name</code>, <code>email</code>, <code>company</code>, <code>title</code>, and <code>message</code>.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 2: AI Lead Scoring</div>
+            <p>Sends the lead data to Ollama with a carefully tuned prompt that evaluates business email, job title seniority, message intent, and company fit. Returns a score from 1&ndash;100 with reasoning.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 3: AI Enrichment</div>
+            <p>A second Ollama call generates company insights based on the email domain and any context from the message. Estimates company size, likely industry, and potential use cases.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 4: Smart Routing</div>
+            <p>Leads scoring above 70 are flagged as "hot" for immediate follow-up. Leads scoring 40&ndash;70 go to nurture. Below 40 are low priority.</p>
+        </div>
+
+        <h3>The Workflow JSON</h3>
+
+        <details class="json-toggle">
+            <summary>Click to expand full workflow JSON</summary>
+            <pre><code>{
+  "name": "AI Lead Scorer + Enrichment (Ollama)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "score-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Receive Lead",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "score-lead"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3:8b', prompt: 'You are a B2B lead scoring expert. Score this lead from 1-100 based on likelihood to convert to a paying customer.\\n\\nEvaluate these signals:\\n- Email domain (business email = higher score, gmail/yahoo = lower)\\n- Job title (C-suite/VP/Director = highest, intern/student = lowest)\\n- Company name (known brands = higher)\\n- Message content (mentions budget, timeline, specific needs = higher)\\n\\nLead data:\\nName: ' + ($json.body.name || 'Unknown') + '\\nEmail: ' + ($json.body.email || 'Unknown') + '\\nCompany: ' + ($json.body.company || 'Unknown') + '\\nJob Title: ' + ($json.body.title || 'Unknown') + '\\nMessage: ' + ($json.body.message || 'No message') + '\\n\\nRespond in this EXACT JSON format, nothing else:\\n{\"score\": <number 1-100>, \"tier\": \"<hot|warm|cold>\", \"reason\": \"<one sentence>\"}', stream: false, options: { temperature: 0.2, num_predict: 200 } }) }}",
+        "options": { "timeout": 60000 }
+      },
+      "id": "score-lead",
+      "name": "Score Lead (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3:8b', prompt: 'Based on this lead information, provide brief company insights.\\n\\nEmail: ' + ($json.body.email || '') + '\\nCompany: ' + ($json.body.company || '') + '\\nTitle: ' + ($json.body.title || '') + '\\n\\nRespond in this EXACT JSON format:\\n{\"estimated_size\": \"<startup|smb|mid-market|enterprise>\", \"likely_industry\": \"<industry>\", \"talking_points\": [\"<point 1>\", \"<point 2>\"]}', stream: false, options: { temperature: 0.3, num_predict: 300 } }) }}",
+        "options": { "timeout": 60000 }
+      },
+      "id": "enrich-lead",
+      "name": "Enrich Lead (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 500]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "lead",
+              "name": "lead",
+              "value": "={{ JSON.stringify({ name: $('Receive Lead').item.json.body.name, email: $('Receive Lead').item.json.body.email, company: $('Receive Lead').item.json.body.company, title: $('Receive Lead').item.json.body.title }) }}",
+              "type": "string"
+            },
+            {
+              "id": "scoring",
+              "name": "scoring",
+              "value": "={{ $('Score Lead (Ollama)').item.json.data ? JSON.parse($('Score Lead (Ollama)').item.json.data).response : 'error' }}",
+              "type": "string"
+            },
+            {
+              "id": "enrichment",
+              "name": "enrichment",
+              "value": "={{ $('Enrich Lead (Ollama)').item.json.data ? JSON.parse($('Enrich Lead (Ollama)').item.json.data).response : 'error' }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "merge-results",
+      "name": "Combine Results",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ lead: JSON.parse($json.lead), scoring: (() => { try { return JSON.parse($json.scoring) } catch(e) { return { raw: $json.scoring } } })(), enrichment: (() => { try { return JSON.parse($json.enrichment) } catch(e) { return { raw: $json.enrichment } } })() }) }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Return Scored Lead",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 400]
+    }
+  ],
+  "connections": {
+    "Receive Lead": {
+      "main": [[
+        { "node": "Score Lead (Ollama)", "type": "main", "index": 0 },
+        { "node": "Enrich Lead (Ollama)", "type": "main", "index": 0 }
+      ]]
+    },
+    "Score Lead (Ollama)": {
+      "main": [[{ "node": "Combine Results", "type": "main", "index": 0 }]]
+    },
+    "Enrich Lead (Ollama)": {
+      "main": [[{ "node": "Combine Results", "type": "main", "index": 0 }]]
+    },
+    "Combine Results": {
+      "main": [[{ "node": "Return Scored Lead", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "AI" }, { "name": "Ollama" }, { "name": "Sales" }, { "name": "Lead Scoring" }]
+}</code></pre>
+        </details>
+
+        <h3>Testing the Workflow</h3>
+
+        <p>Once imported and activated, test with curl:</p>
+
+        <pre><code>curl -X POST http://localhost:5678/webhook/score-lead \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Sarah Chen",
+    "email": "sarah.chen@acme-corp.com",
+    "company": "Acme Corp",
+    "title": "VP of Operations",
+    "message": "We are evaluating workflow automation tools for our team of 50. Looking to implement in Q2 with a budget of $5-10k."
+  }'</code></pre>
+
+        <p>Expected response:</p>
+
+        <pre><code>{
+  "lead": {
+    "name": "Sarah Chen",
+    "email": "sarah.chen@acme-corp.com",
+    "company": "Acme Corp",
+    "title": "VP of Operations"
+  },
+  "scoring": {
+    "score": 88,
+    "tier": "hot",
+    "reason": "VP-level decision maker with specific budget, timeline, and team size at a business domain"
+  },
+  "enrichment": {
+    "estimated_size": "mid-market",
+    "likely_industry": "technology",
+    "talking_points": [
+      "Operations focus suggests process optimization needs",
+      "50-person team indicates growing organization with automation potential"
+    ]
+  }
+}</code></pre>
+
+        <h2>Extending the Workflow</h2>
+
+        <p>This free version gives you the scoring engine. Here's how to make it production-ready:</p>
+
+        <h3>Connect to Your CRM</h3>
+        <p>Add a node after scoring to push results to HubSpot, Salesforce, or Pipedrive. n8n has native nodes for all major CRMs. The scored lead data maps directly to custom properties.</p>
+
+        <h3>Slack/Email Alerts for Hot Leads</h3>
+        <p>Add a Switch node after scoring. Route leads with <code>score &gt; 70</code> to a Slack notification or email alert so your sales team can follow up within minutes.</p>
+
+        <h3>Store Leads in a Database</h3>
+        <p>Add a PostgreSQL or Google Sheets node to log every scored lead. Track conversion rates by score tier to validate and tune your scoring model over time.</p>
+
+        <h3>Batch Processing</h3>
+        <p>Instead of webhook-triggered, set up a schedule trigger that pulls new leads from your CRM every 15 minutes and scores them in batches.</p>
+
+        <h2>How the Prompt Engineering Works</h2>
+
+        <p>The scoring prompt is the core of this workflow. Here's why specific choices matter:</p>
+
+        <p><strong>Structured JSON output:</strong> The prompt asks for <code>{"score": X, "tier": "Y", "reason": "Z"}</code>. This gives you machine-parseable output that downstream nodes can work with. The <code>temperature: 0.2</code> setting keeps output consistent.</p>
+
+        <p><strong>Explicit scoring criteria:</strong> Rather than asking "score this lead," the prompt lists specific signals (email domain, job title, budget mentions). This makes the model's reasoning predictable and auditable.</p>
+
+        <p><strong>Separate enrichment call:</strong> Scoring and enrichment are split into two Ollama calls running in parallel. This is faster than one large prompt and lets you tune each independently.</p>
+
+        <div class="highlight">
+            <p><strong>Model recommendation:</strong> <code>llama3:8b</code> handles this well for most leads. If you need better accuracy for complex B2B scenarios, try <code>llama3:70b</code> or <code>mistral:7b-instruct</code>. The workflow JSON works with any Ollama model &mdash; just change the model name.</p>
+        </div>
+
+        <h2>Comparison: Local vs. Cloud Lead Scoring</h2>
+
+        <table>
+            <tr><th></th><th>n8n + Ollama (Local)</th><th>Clay / Apollo / HubSpot AI</th></tr>
+            <tr><td><strong>Cost</strong></td><td>$0/month (runs on your hardware)</td><td>$50&ndash;300/month</td></tr>
+            <tr><td><strong>Data privacy</strong></td><td>Lead data never leaves your server</td><td>Sent to third-party servers</td></tr>
+            <tr><td><strong>Customization</strong></td><td>Full control over scoring criteria</td><td>Limited to vendor's model</td></tr>
+            <tr><td><strong>Lead volume</strong></td><td>Unlimited</td><td>Tiered by plan</td></tr>
+            <tr><td><strong>Setup time</strong></td><td>30 minutes</td><td>15 minutes</td></tr>
+            <tr><td><strong>Accuracy</strong></td><td>Good for structured signals</td><td>Better for enrichment-heavy scoring</td></tr>
+        </table>
+
+        <p>The local approach wins on cost and privacy. Cloud tools win on enrichment data (they have databases of company info). For most small-to-mid businesses processing under 500 leads/day, the local approach is more than sufficient.</p>
+
+        <div class="cta">
+            <h3>Want the Production-Ready Version?</h3>
+            <p>The <strong>Self-Hosted AI Workflow Pack</strong> includes an advanced lead scorer with CRM integration, Slack alerts, score calibration, and 10 more AI workflows &mdash; all running locally with Ollama.</p>
+            <a href="https://buy.stripe.com/28EaEXdSJ1I67WbaivabK0c" class="btn">Get All 11 Workflows &mdash; $39</a>
+            <p style="margin-top: 1rem; color: var(--muted); font-size: 0.85rem;">One-time purchase. No subscriptions. 30-day money-back guarantee.</p>
+        </div>
+
+        <h2>Next Steps</h2>
+
+        <ol>
+            <li><strong>Import the workflow</strong> &mdash; Copy the JSON above into n8n</li>
+            <li><strong>Test with sample leads</strong> &mdash; Use the curl command to send test data</li>
+            <li><strong>Connect to your form</strong> &mdash; Point your website's contact form at the webhook URL</li>
+            <li><strong>Add routing</strong> &mdash; Connect Slack, email, or CRM nodes for automatic follow-up</li>
+        </ol>
+
+        <p>If you want to explore more n8n + Ollama workflows, check out our other tutorials:</p>
+        <ul>
+            <li><a href="/n8n-ai-workflows/blog/automate-email-responses-n8n-ollama.html">Automate Email Responses with n8n + Ollama</a></li>
+            <li><a href="/n8n-ai-workflows/blog/n8n-social-media-content-generator-ollama.html">Social Media Content Generator with n8n + Ollama</a></li>
+            <li><a href="/n8n-ai-workflows/blog/">All n8n + Ollama Tutorials</a></li>
+        </ul>
+    </article>
+
+    <footer>
+        <p>&copy; 2026 Workflow Forge. Built with n8n + Ollama.</p>
+    </footer>
+</div>
+</body>
+</html>
