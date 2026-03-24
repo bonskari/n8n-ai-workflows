@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Build an AI Email Auto-Responder with n8n and Ollama (No API Keys Needed)</title>
+    <meta name="description" content="Step-by-step n8n Ollama tutorial: build a self-hosted AI email automation that classifies, prioritizes, and auto-responds to emails. No API keys, no cloud, no monthly fees.">
+    <meta name="keywords" content="n8n ollama tutorial, self-hosted AI automation, local AI email automation, n8n AI workflow, n8n email responder, ollama email automation">
+    <meta property="og:title" content="How to Build an AI Email Auto-Responder with n8n and Ollama (No API Keys Needed)">
+    <meta property="og:description" content="Complete n8n Ollama tutorial for building a local AI email automation. Classify, prioritize, and draft replies with zero API costs.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://bonskari.github.io/n8n-ai-workflows/tutorial-local-ai-email-automation.html">
+    <meta property="og:site_name" content="WorkflowForge">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Build an AI Email Auto-Responder with n8n + Ollama">
+    <meta name="twitter:description" content="Self-hosted AI email automation tutorial. No API keys, no monthly costs. Full step-by-step guide.">
+    <link rel="canonical" href="https://bonskari.github.io/n8n-ai-workflows/tutorial-local-ai-email-automation.html">
+    <style>
+        :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --orange: #d29922; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+        .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav { padding: 1rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; line-height: 1.3; }
+        h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; color: var(--accent); }
+        h3 { font-size: 1.2rem; margin: 2rem 0 0.75rem; }
+        p { margin-bottom: 1.2rem; }
+        .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        code { background: var(--surface); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem; color: var(--green); }
+        pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; overflow-x: auto; }
+        pre code { background: none; padding: 0; color: var(--text); }
+        ul, ol { margin: 0 0 1.2rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        .highlight { background: rgba(88,166,255,0.1); border-left: 3px solid var(--accent); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0; }
+        .warning { background: rgba(210,153,34,0.1); border-left: 3px solid var(--orange); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0; }
+        .cta-box { background: var(--surface); border: 2px solid var(--green); border-radius: 12px; padding: 2rem; text-align: center; margin: 3rem 0; }
+        .cta-box h3 { color: var(--green); margin-top: 0; }
+        .cta-btn { display: inline-block; background: var(--green); color: #000; padding: 0.8rem 2rem; border-radius: 8px; font-weight: 700; text-decoration: none; margin-top: 1rem; }
+        .cta-btn:hover { background: #4cc963; }
+        a { color: var(--accent); }
+        .step { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin: 1.5rem 0; }
+        .step-number { display: inline-block; background: var(--accent); color: #000; width: 28px; height: 28px; border-radius: 50%; text-align: center; line-height: 28px; font-weight: 700; margin-right: 0.5rem; font-size: 0.85rem; }
+        .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 2rem 0; }
+        .toc h4 { margin-bottom: 0.75rem; color: var(--muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.1em; }
+        .toc ul { list-style: none; margin: 0; padding: 0; }
+        .toc li { margin-bottom: 0.4rem; }
+        .toc a { color: var(--text); text-decoration: none; }
+        .toc a:hover { color: var(--accent); }
+        .prereq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .prereq-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+        .prereq-card strong { display: block; margin-bottom: 0.25rem; }
+        .prereq-card span { color: var(--muted); font-size: 0.85rem; }
+        footer { border-top: 1px solid var(--border); margin-top: 3rem; padding-top: 1.5rem; }
+        footer p { color: var(--muted); font-size: 0.85rem; }
+        @media (max-width: 600px) {
+            h1 { font-size: 1.7rem; }
+            .prereq-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "How to Build an AI Email Auto-Responder with n8n and Ollama (No API Keys Needed)",
+        "description": "Step-by-step tutorial for building a self-hosted AI email auto-responder using n8n and Ollama. Covers IMAP setup, AI classification, smart reply drafting, and production deployment.",
+        "datePublished": "2026-03-24",
+        "dateModified": "2026-03-24",
+        "author": {
+            "@type": "Organization",
+            "name": "WorkflowForge",
+            "url": "https://bonskari.github.io/n8n-ai-workflows/"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "WorkflowForge"
+        },
+        "proficiencyLevel": "Beginner",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://bonskari.github.io/n8n-ai-workflows/tutorial-local-ai-email-automation.html"
+        },
+        "keywords": "n8n ollama tutorial, self-hosted AI automation, local AI email automation, n8n AI workflow"
+    }
+    </script>
+</head>
+<body>
+<div class="container">
+    <nav><a href="./">&larr; Self-Hosted AI Workflow Pack</a></nav>
+
+    <h1>How to Build an AI Email Auto-Responder with n8n and Ollama (No API Keys Needed)</h1>
+    <p class="meta">Published March 24, 2026 &middot; 18 min read &middot; Beginner-friendly</p>
+
+    <p>Your inbox is a time sink. The average professional spends over 2 hours per day reading and responding to emails, and most of those replies follow predictable patterns. What if you could build an AI system that reads every incoming email, classifies it by type and urgency, and drafts a context-aware reply &mdash; all running on your own machine with zero API costs?</p>
+
+    <p>In this <strong>n8n Ollama tutorial</strong>, you will build exactly that: a <strong>self-hosted AI email automation</strong> pipeline that connects your inbox to a locally-running AI model. No OpenAI key. No cloud dependency. No per-request charges. Just your hardware, doing the work.</p>
+
+    <p>By the end, you will have a working <strong>n8n AI workflow</strong> that polls your inbox every 5 minutes, classifies each message (support, sales, spam, personal), rates the urgency, and drafts a reply that you can review and send with one click.</p>
+
+    <div class="highlight">
+        <strong>Want to skip ahead?</strong> We have published the complete workflow template as a free open-source repo: <a href="https://github.com/bonskari/n8n-ollama-email-responder">n8n-ollama-email-responder on GitHub</a>. Clone it, import the JSON into n8n, and you are running in under 5 minutes.
+    </div>
+
+    <div class="toc">
+        <h4>Table of Contents</h4>
+        <ul>
+            <li><a href="#prerequisites">Prerequisites</a></li>
+            <li><a href="#architecture">How the Workflow Works</a></li>
+            <li><a href="#step1">Step 1: Install Ollama and Pull a Model</a></li>
+            <li><a href="#step2">Step 2: Set Up n8n and Verify the Connection</a></li>
+            <li><a href="#step3">Step 3: Connect Your Inbox with IMAP</a></li>
+            <li><a href="#step4">Step 4: Build the AI Classification Node</a></li>
+            <li><a href="#step5">Step 5: Parse and Route by Category</a></li>
+            <li><a href="#step6">Step 6: Draft Smart Replies with AI</a></li>
+            <li><a href="#step7">Step 7: Send or Queue the Drafted Reply</a></li>
+            <li><a href="#production">Going to Production</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+            <li><a href="#next-steps">Next Steps</a></li>
+        </ul>
+    </div>
+
+    <h2 id="prerequisites">Prerequisites</h2>
+    <p>You do not need to be an AI expert. If you have installed software from the terminal before, you can follow this tutorial. Here is what you need:</p>
+
+    <div class="prereq-grid">
+        <div class="prereq-card">
+            <strong>Hardware</strong>
+            <span>8 GB RAM minimum. 16 GB recommended. A GPU speeds things up but is not required.</span>
+        </div>
+        <div class="prereq-card">
+            <strong>n8n</strong>
+            <span>Self-hosted, version 1.0 or later. Docker install recommended.</span>
+        </div>
+        <div class="prereq-card">
+            <strong>Ollama</strong>
+            <span>Free, open-source local AI runner. We will install it in Step 1.</span>
+        </div>
+        <div class="prereq-card">
+            <strong>Email Account</strong>
+            <span>Any IMAP-compatible email (Gmail, Outlook, Fastmail, self-hosted).</span>
+        </div>
+    </div>
+
+    <p>Time required: approximately 20 minutes for the first setup. After that, the workflow runs unattended.</p>
+
+    <h2 id="architecture">How the Workflow Works</h2>
+    <p>Before we start building, here is the high-level flow of the <strong>local AI email automation</strong> system:</p>
+
+    <ol>
+        <li><strong>IMAP Trigger</strong> &mdash; n8n polls your inbox on a schedule (every 5 minutes by default)</li>
+        <li><strong>AI Classification</strong> &mdash; Ollama reads the email and returns a structured JSON classification: category, urgency, sentiment</li>
+        <li><strong>Smart Routing</strong> &mdash; A Switch node routes emails to different handling paths based on the classification</li>
+        <li><strong>AI Reply Drafting</strong> &mdash; Ollama generates a context-aware reply, tailored to the email category</li>
+        <li><strong>Output</strong> &mdash; The drafted reply is saved to a Google Sheet, sent via webhook, or placed into your drafts folder</li>
+    </ol>
+
+    <p>Each step is a node in n8n. The entire pipeline runs locally. Your email content never touches a third-party AI provider.</p>
+
+    <h2 id="step1">Step 1: Install Ollama and Pull a Model</h2>
+
+    <div class="step">
+        <p><span class="step-number">1</span> <strong>Install Ollama</strong></p>
+        <p>Ollama is a lightweight runtime that lets you run large language models locally. Installation takes about 60 seconds.</p>
+        <pre><code># Linux or macOS (one-line install)
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Windows: download the installer from https://ollama.ai/download</code></pre>
+    </div>
+
+    <div class="step">
+        <p><span class="step-number">2</span> <strong>Pull the llama3:8b model</strong></p>
+        <p>This is a strong general-purpose model that handles classification and text generation well. The download is approximately 4.7 GB.</p>
+        <pre><code>ollama pull llama3:8b</code></pre>
+        <p>If you have limited RAM (8 GB), use <code>mistral:7b</code> instead &mdash; it is slightly smaller and still performs well for email tasks.</p>
+    </div>
+
+    <div class="step">
+        <p><span class="step-number">3</span> <strong>Verify Ollama is running</strong></p>
+        <pre><code>curl http://localhost:11434/api/tags</code></pre>
+        <p>You should see a JSON response listing your installed models. If you get a "connection refused" error, start Ollama with <code>ollama serve</code>.</p>
+    </div>
+
+    <h2 id="step2">Step 2: Set Up n8n and Verify the Connection</h2>
+
+    <div class="step">
+        <p><span class="step-number">4</span> <strong>Start n8n with Docker</strong></p>
+        <p>Docker is the easiest way to run n8n. The <code>--add-host</code> flag is critical &mdash; it lets n8n inside Docker reach Ollama on your host machine.</p>
+        <pre><code>docker run -d --name n8n \
+  -p 5678:5678 \
+  -v n8n_data:/home/node/.n8n \
+  --add-host=host.docker.internal:host-gateway \
+  n8nio/n8n</code></pre>
+        <p>Open <code>http://localhost:5678</code> in your browser and create your admin account.</p>
+        <p>Alternative: if you prefer npm, run <code>npm install n8n -g && n8n start</code>.</p>
+    </div>
+
+    <div class="step">
+        <p><span class="step-number">5</span> <strong>Test the n8n-to-Ollama connection</strong></p>
+        <p>Create a new workflow in n8n. Add a <strong>Manual Trigger</strong> node, then add an <strong>HTTP Request</strong> node with these settings:</p>
+        <ul>
+            <li><strong>Method:</strong> GET</li>
+            <li><strong>URL:</strong> <code>http://host.docker.internal:11434/api/tags</code></li>
+        </ul>
+        <p>Click "Execute Workflow." If you see your model list in the output, the connection works. If you installed n8n with npm (not Docker), use <code>http://localhost:11434/api/tags</code> instead.</p>
+    </div>
+
+    <h2 id="step3">Step 3: Connect Your Inbox with IMAP</h2>
+
+    <div class="step">
+        <p><span class="step-number">6</span> <strong>Add an IMAP Email trigger</strong></p>
+        <p>Delete the Manual Trigger and replace it with an <strong>IMAP Email</strong> node. Configure it with your email credentials:</p>
+        <ul>
+            <li><strong>Host:</strong> <code>imap.gmail.com</code> (or your provider's IMAP server)</li>
+            <li><strong>Port:</strong> <code>993</code></li>
+            <li><strong>User:</strong> your email address</li>
+            <li><strong>Password:</strong> your app password (not your regular password)</li>
+            <li><strong>Mailbox:</strong> <code>INBOX</code></li>
+        </ul>
+    </div>
+
+    <div class="warning">
+        <strong>Gmail users:</strong> You need to generate an App Password. Go to <a href="https://myaccount.google.com/apppasswords">myaccount.google.com/apppasswords</a>, create a password for "Mail", and use that in n8n. Two-factor authentication must be enabled on your Google account first.
+    </div>
+
+    <p>The IMAP node will poll for new emails on whatever schedule you set in the workflow settings (we will set it to every 5 minutes later). Each new email arrives as a JSON object with <code>from</code>, <code>subject</code>, <code>text</code>, and <code>date</code> fields.</p>
+
+    <h2 id="step4">Step 4: Build the AI Classification Node</h2>
+
+    <p>This is where the <strong>self-hosted AI automation</strong> starts. We send the email content to Ollama and ask it to classify the message into structured categories.</p>
+
+    <div class="step">
+        <p><span class="step-number">7</span> <strong>Add an HTTP Request node after the IMAP trigger</strong></p>
+        <p>Configure it to POST to Ollama's generate endpoint:</p>
+        <ul>
+            <li><strong>Method:</strong> POST</li>
+            <li><strong>URL:</strong> <code>http://host.docker.internal:11434/api/generate</code></li>
+            <li><strong>Body Content Type:</strong> JSON</li>
+            <li><strong>Timeout:</strong> <code>120000</code> (120 seconds &mdash; local models can be slow on CPU)</li>
+        </ul>
+        <p>Set the JSON body to:</p>
+        <pre><code>{
+  "model": "llama3:8b",
+  "prompt": "You are an email classification assistant. Analyze this email and return a JSON object.\n\nClassify into exactly ONE category: support, sales, partnership, personal, newsletter, spam\nRate urgency: low, medium, high\nDetect sentiment: positive, neutral, negative\nProvide a 1-sentence summary.\n\nEmail from: {{ $json.from }}\nSubject: {{ $json.subject }}\nBody: {{ $json.text }}\n\nReturn ONLY valid JSON, no other text:\n{\"category\": \"...\", \"urgency\": \"...\", \"sentiment\": \"...\", \"summary\": \"...\"}",
+  "stream": false,
+  "options": {
+    "temperature": 0.1
+  }
+}</code></pre>
+    </div>
+
+    <p>A few things to note about this prompt:</p>
+    <ul>
+        <li><strong>Temperature 0.1</strong> makes the output nearly deterministic. For classification tasks, you want consistency, not creativity.</li>
+        <li><strong>"Return ONLY valid JSON"</strong> is important. Without this instruction, the model tends to add explanations before or after the JSON, which breaks parsing.</li>
+        <li>The double-brace expressions (<code>{{ $json.from }}</code>) are n8n template expressions that inject the email data into the prompt.</li>
+    </ul>
+
+    <h2 id="step5">Step 5: Parse and Route by Category</h2>
+
+    <div class="step">
+        <p><span class="step-number">8</span> <strong>Add a Code node to parse the AI response</strong></p>
+        <p>Ollama returns the generated text in a <code>response</code> field. We need to extract the JSON from it:</p>
+        <pre><code>// Extract JSON from the AI response
+const aiResponse = $input.first().json.response;
+const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+
+if (!jsonMatch) {
+  throw new Error('AI did not return valid JSON. Raw response: ' + aiResponse);
+}
+
+const classification = JSON.parse(jsonMatch[0]);
+
+return [{
+  json: {
+    ...classification,
+    original_from: $('IMAP Email').first().json.from,
+    original_subject: $('IMAP Email').first().json.subject,
+    original_body: $('IMAP Email').first().json.text,
+    processed_at: new Date().toISOString()
+  }
+}];</code></pre>
+        <p>The regex <code>/\{[\s\S]*\}/</code> captures everything between the first <code>{</code> and last <code>}</code>, which handles cases where the model includes extra text around the JSON.</p>
+    </div>
+
+    <div class="step">
+        <p><span class="step-number">9</span> <strong>Add a Switch node to route by category</strong></p>
+        <p>Create a Switch node with the routing field set to <code>{{ $json.category }}</code>. Add these outputs:</p>
+        <ul>
+            <li><code>support</code> &rarr; connects to a support reply drafting node</li>
+            <li><code>sales</code> &rarr; connects to a sales reply drafting node</li>
+            <li><code>spam</code> / <code>newsletter</code> &rarr; connects to an archive or delete action</li>
+            <li><strong>Default</strong> &rarr; connects to a generic reply node (catches partnership, personal, etc.)</li>
+        </ul>
+        <p>This routing means each email category gets a specialized prompt for reply generation, which produces much better output than a one-size-fits-all approach.</p>
+    </div>
+
+    <h2 id="step6">Step 6: Draft Smart Replies with AI</h2>
+
+    <p>Now we build the reply-drafting nodes. Each category gets its own HTTP Request node calling Ollama, but with a different prompt tailored to that type of email.</p>
+
+    <div class="step">
+        <p><span class="step-number">10</span> <strong>Support reply node</strong></p>
+        <pre><code>{
+  "model": "llama3:8b",
+  "prompt": "Draft a professional support reply to this email.\n\nFrom: {{ $json.original_from }}\nSubject: {{ $json.original_subject }}\nBody: {{ $json.original_body }}\n\nGuidelines:\n- Be empathetic and acknowledge the issue\n- Provide specific, actionable troubleshooting steps\n- Offer to escalate if the steps don't resolve it\n- Keep it under 150 words\n- Professional but warm tone\n\nWrite ONLY the reply body, no subject line or signature.",
+  "stream": false,
+  "options": { "temperature": 0.5 }
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <p><span class="step-number">11</span> <strong>Sales reply node</strong></p>
+        <pre><code>{
+  "model": "llama3:8b",
+  "prompt": "Draft a reply to this sales inquiry.\n\nFrom: {{ $json.original_from }}\nSubject: {{ $json.original_subject }}\nBody: {{ $json.original_body }}\n\nGuidelines:\n- Thank them for their interest\n- Answer their specific question if one was asked\n- Briefly highlight key benefits relevant to their inquiry\n- Include a clear call to action (book a demo, start a trial, etc.)\n- Confident but not pushy\n- Keep it under 150 words\n\nWrite ONLY the reply body.",
+  "stream": false,
+  "options": { "temperature": 0.5 }
+}</code></pre>
+    </div>
+
+    <p>For the generic/default reply, use a neutral prompt that acknowledges the email and says you will follow up shortly. The higher temperature (0.5) gives the replies more natural variation compared to the classification step.</p>
+
+    <h2 id="step7">Step 7: Send or Queue the Drafted Reply</h2>
+
+    <div class="step">
+        <p><span class="step-number">12</span> <strong>Choose your output method</strong></p>
+        <p>You have several options for what to do with the drafted reply:</p>
+        <ul>
+            <li><strong>Google Sheets</strong> &mdash; Add a Google Sheets node to log every email with its classification and draft reply. Review and send manually. Best for getting started.</li>
+            <li><strong>Gmail Draft</strong> &mdash; Use the Gmail node to create a draft reply in your inbox. You review and hit send.</li>
+            <li><strong>SMTP Send</strong> &mdash; Auto-send low-risk replies (like spam acknowledgments). Be careful with this &mdash; always review the AI's output before enabling auto-send for important categories.</li>
+            <li><strong>Webhook</strong> &mdash; POST the classification and draft to Slack, a dashboard, or another system.</li>
+        </ul>
+    </div>
+
+    <div class="warning">
+        <strong>Start with drafts, not auto-send.</strong> Even the best AI makes mistakes. Run the workflow in draft mode for at least a week and review every response before upgrading to auto-send on any category.
+    </div>
+
+    <div class="step">
+        <p><span class="step-number">13</span> <strong>Set the schedule</strong></p>
+        <p>Go to your workflow settings and set it to run on a schedule: every 5 minutes is a reasonable starting point. Activate the workflow, and your <strong>n8n AI workflow</strong> is live.</p>
+    </div>
+
+    <h2 id="production">Going to Production</h2>
+
+    <p>Once you have verified the workflow handles your emails correctly, here are some improvements for production use:</p>
+
+    <h3>Add Error Handling</h3>
+    <p>Wrap the AI classification and reply nodes in n8n's error workflow feature. If Ollama times out or returns garbage, the error handler can log the failure and forward the email to you unprocessed rather than losing it.</p>
+
+    <h3>Filter Before Classification</h3>
+    <p>Add a filter node before the AI step to skip emails you never want to process: automated notifications from services, calendar invites, delivery receipts. This saves processing time and keeps your logs clean.</p>
+
+    <h3>Log Everything</h3>
+    <p>Add a Google Sheets or database node at the end of every path to log the email address, classification result, and draft reply. This gives you an audit trail and lets you measure classification accuracy over time.</p>
+
+    <h3>Model Selection for Production</h3>
+    <p>For email classification specifically, <code>llama3:8b</code> hits the sweet spot of speed and accuracy. If you need faster processing on CPU-only hardware, <code>phi3:mini</code> (3.8B parameters) handles classification well at roughly 3x the speed. For reply drafting where quality matters more, stick with the 8B model or go larger if your hardware allows.</p>
+
+    <h2 id="troubleshooting">Troubleshooting</h2>
+
+    <h3>Connection Issues</h3>
+    <ul>
+        <li><strong>"Connection refused" from n8n to Ollama</strong> &mdash; If n8n runs in Docker, you must use <code>http://host.docker.internal:11434</code> instead of <code>localhost</code>. If n8n is installed via npm on the same machine, <code>localhost</code> works fine.</li>
+        <li><strong>Ollama not running</strong> &mdash; Run <code>ollama serve</code> in a terminal. On Linux, you may want to set it up as a systemd service so it starts on boot.</li>
+    </ul>
+
+    <h3>AI Output Issues</h3>
+    <ul>
+        <li><strong>AI returns text instead of JSON</strong> &mdash; Strengthen the prompt: add "You MUST return ONLY a JSON object. No explanations, no markdown, no code fences." Also ensure temperature is below 0.3 for classification.</li>
+        <li><strong>Classification is inconsistent</strong> &mdash; Lower the temperature to 0.05. Add 2-3 example classifications to your prompt (few-shot prompting). This dramatically improves consistency.</li>
+        <li><strong>Replies are too generic</strong> &mdash; Add specific context to the reply prompt: your company name, product details, common FAQ answers. The more context the model has, the better the replies.</li>
+    </ul>
+
+    <h3>Performance Issues</h3>
+    <ul>
+        <li><strong>Timeout errors</strong> &mdash; Increase the HTTP Request timeout to 180000ms (3 minutes). First-run requests are slower because the model is loading into memory.</li>
+        <li><strong>Slow on CPU</strong> &mdash; Use a smaller model like <code>mistral:7b</code> or <code>phi3:mini</code>. Even a modest GPU (RTX 3060, 12 GB VRAM) makes a 5-10x speed difference.</li>
+        <li><strong>High memory usage</strong> &mdash; Ollama loads the model into RAM. Close other memory-intensive applications. If you have exactly 8 GB RAM, use a smaller model and close your browser while running the workflow.</li>
+    </ul>
+
+    <h3>IMAP Issues</h3>
+    <ul>
+        <li><strong>Gmail "Application-specific password required"</strong> &mdash; Enable 2FA on your Google account, then generate an App Password at <a href="https://myaccount.google.com/apppasswords">myaccount.google.com/apppasswords</a>.</li>
+        <li><strong>No emails being fetched</strong> &mdash; Check that the mailbox name is correct (<code>INBOX</code> is case-sensitive for some providers). Test your credentials with a desktop email client first.</li>
+    </ul>
+
+    <h2 id="next-steps">Next Steps</h2>
+
+    <p>You now have a working <strong>local AI email automation</strong> pipeline. Here are a few ways to extend it:</p>
+
+    <ul>
+        <li><strong>Add sentiment-based priority:</strong> Route high-urgency, negative-sentiment emails to a Slack notification so you respond to angry customers immediately.</li>
+        <li><strong>Build a feedback loop:</strong> Track which drafts you edit heavily before sending. Use those corrections to refine your prompts over time.</li>
+        <li><strong>Multi-language support:</strong> Add "Detect the language of the email and reply in the same language" to your reply prompt. Models like llama3 handle this well.</li>
+        <li><strong>Connect to a CRM:</strong> Use the classification data to auto-create or update contacts in your CRM based on email category and sentiment.</li>
+    </ul>
+
+    <div class="highlight">
+        <strong>Get the template:</strong> The complete workflow JSON is available for free on GitHub: <a href="https://github.com/bonskari/n8n-ollama-email-responder">n8n-ollama-email-responder</a>. Clone the repo, import the JSON file into n8n, update your IMAP credentials, and you are running in under 5 minutes.
+    </div>
+
+    <div class="cta-box">
+        <h3>Want All 11 Workflows?</h3>
+        <p>The email auto-responder is one of 11 production-ready n8n + Ollama workflows in our complete pack. You also get an AI blog writer, social media content generator, lead scoring system, document summarizer, competitor intelligence monitor, and more.</p>
+        <p><strong>$39 one-time payment &mdash; no subscriptions, no API costs</strong></p>
+        <a href="https://buy.stripe.com/28EaEXdSJ1I67WbaivabK0c" class="cta-btn">Get the Full Pack &rarr;</a>
+        <p style="color: var(--muted); font-size: 0.85rem; margin-top: 1rem; margin-bottom: 0;">30-day money-back guarantee. Instant download.</p>
+    </div>
+
+    <h3>Related Tutorials</h3>
+    <ul>
+        <li><a href="blog/self-hosted-ai-workflows-n8n-ollama.html">How to Build Self-Hosted AI Workflows with n8n and Ollama (2026 Guide)</a></li>
+        <li><a href="blog/n8n-ollama-tutorial-local-ai-automation.html">n8n + Ollama Tutorial: Automate Everything with Local AI</a></li>
+        <li><a href="blog/automate-email-responses-n8n-ollama.html">How to Automate Email Responses with n8n and Ollama</a></li>
+    </ul>
+
+    <h3>Free Samples</h3>
+    <p>Try these open-source workflows to see the quality before buying the pack:</p>
+    <ul>
+        <li><a href="https://github.com/bonskari/n8n-ollama-social-content">Free: AI Social Media Content Generator</a></li>
+        <li><a href="https://github.com/bonskari/n8n-ollama-blog-writer">Free: AI Blog Writer Pipeline</a></li>
+        <li><a href="https://github.com/bonskari/n8n-ollama-email-responder">Free: AI Email Auto-Responder</a> (the workflow from this tutorial)</li>
+    </ul>
+
+    <footer>
+        <p>Published by WorkflowForge &middot; <a href="./">Self-Hosted AI Workflow Pack</a></p>
+    </footer>
+</div>
+</body>
+</html>
