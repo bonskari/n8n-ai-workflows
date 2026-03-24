@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Build a Private RAG Knowledge Base with n8n + Ollama (No Cloud APIs)</title>
+    <meta name="description" content="Build a fully private RAG knowledge base using n8n, Ollama, and Qdrant. Ingest documents, generate embeddings, and query with local AI. No cloud APIs, no data leaks. Step-by-step tutorial with workflow JSON.">
+    <meta property="og:title" content="Build a Private RAG Knowledge Base with n8n + Ollama (No Cloud APIs)">
+    <meta property="og:description" content="Self-hosted RAG pipeline with n8n, Ollama, and Qdrant. Ingest PDFs, embed locally, query with AI. Zero API costs, full data privacy.">
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="https://bonskari.github.io/n8n-ai-workflows/blog/n8n-rag-knowledge-base-ollama-private.html">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "How to Build a Private RAG Knowledge Base with n8n + Ollama (No Cloud APIs)",
+        "description": "Build a fully private RAG knowledge base using n8n, Ollama, and Qdrant. Ingest documents, generate embeddings, and query with local AI.",
+        "author": {"@type": "Organization", "name": "WorkflowForge"},
+        "datePublished": "2026-03-24",
+        "publisher": {"@type": "Organization", "name": "WorkflowForge"},
+        "proficiencyLevel": "Intermediate"
+    }
+    </script>
+    <style>
+        :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --orange: #d29922; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+        .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav { padding: 1rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; line-height: 1.3; }
+        h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; color: var(--accent); }
+        h3 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; }
+        .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1rem 0 1.5rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; }
+        code { font-family: 'SF Mono', 'Fira Code', monospace; }
+        p code, li code { background: var(--surface); border: 1px solid var(--border); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.88em; }
+        ul, ol { margin: 0 0 1rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .cta { background: linear-gradient(135deg, #1a3a5c, #1a2d4a); border: 1px solid var(--accent); border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center; }
+        .cta h3 { color: var(--accent); margin-top: 0; }
+        .cta .btn { display: inline-block; background: var(--accent); color: #000; padding: 0.75rem 2rem; border-radius: 8px; font-weight: bold; text-decoration: none; margin-top: 1rem; }
+        .cta .btn:hover { opacity: 0.9; text-decoration: none; }
+        .highlight { background: var(--surface); border-left: 3px solid var(--accent); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
+        th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; }
+        th { background: var(--surface); }
+        .step { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+        .step-number { color: var(--accent); font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .json-toggle { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin: 1.5rem 0; }
+        .json-toggle summary { cursor: pointer; padding: 1rem 1.25rem; font-weight: 600; color: var(--accent); }
+        .json-toggle summary:hover { background: rgba(88,166,255,0.05); }
+        .json-toggle pre { margin: 0; border: none; border-top: 1px solid var(--border); border-radius: 0 0 8px 8px; max-height: 500px; overflow-y: auto; }
+        footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
+        @media (max-width: 600px) { h1 { font-size: 1.6rem; } .cta { padding: 1.5rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav><a href="../">&larr; n8n AI Workflow Templates</a> &middot; <a href="https://bonskari.github.io/n8n-ai-workflows/blog/">Blog</a></nav>
+
+    <article>
+        <h1>How to Build a Private RAG Knowledge Base with n8n + Ollama (No Cloud APIs)</h1>
+        <p class="meta">Published March 24, 2026 &middot; 14 min read &middot; Intermediate</p>
+
+        <p>Retrieval-Augmented Generation (RAG) is the pattern behind every "chat with your documents" product you have seen. Feed your PDFs, internal docs, and knowledge base articles into a vector database, then let an LLM answer questions grounded in your actual data &mdash; no hallucinations, no guessing.</p>
+
+        <p>The problem? Most RAG tutorials assume you will send your proprietary documents to OpenAI for embedding and querying. That means your internal SOPs, customer data, legal contracts, and engineering docs all pass through third-party servers. For many teams, that is a non-starter.</p>
+
+        <p>This guide shows you how to build a <strong>fully private RAG knowledge base</strong> using n8n, Ollama, and Qdrant &mdash; three open-source tools running entirely on your own hardware. No API keys, no per-token billing, no data leaving your network.</p>
+
+        <div class="highlight">
+            <strong>What you will build:</strong> Two n8n workflows &mdash; one that ingests documents (PDF, text, markdown) into a Qdrant vector database with locally generated embeddings, and one that lets you query that knowledge base using natural language, with Ollama generating grounded answers from your own documents.
+        </div>
+
+        <h2>Why Private, Self-Hosted RAG Matters</h2>
+
+        <p>Before we build, here is why you should care about keeping your RAG pipeline local:</p>
+
+        <ul>
+            <li><strong>Data privacy</strong> &mdash; Legal contracts, HR policies, customer records, and proprietary research never leave your infrastructure. No third-party data processing agreements needed.</li>
+            <li><strong>Zero API costs</strong> &mdash; OpenAI's embedding API charges $0.10 per million tokens. That sounds cheap until you are indexing thousands of documents and running hundreds of queries per day. Locally, every embedding and every query costs $0.</li>
+            <li><strong>Regulatory compliance</strong> &mdash; GDPR, HIPAA, SOC 2, and industry-specific regulations often restrict where data can be processed. A self-hosted RAG pipeline simplifies compliance because your data never crosses network boundaries.</li>
+            <li><strong>No rate limits</strong> &mdash; Embed and query as fast as your hardware allows. No throttling, no 429 errors, no waiting for quota resets.</li>
+            <li><strong>Offline capability</strong> &mdash; Your knowledge base keeps working during internet outages, cloud provider incidents, or in air-gapped environments.</li>
+        </ul>
+
+        <h2>Architecture Overview</h2>
+
+        <p>The stack has three components, each handling a specific job:</p>
+
+        <pre><code>DOCUMENTS (PDF, TXT, MD)
+        |
+        v
+[n8n: Ingestion Workflow]
+        |
+        v
+[Ollama: nomic-embed-text] --generates embeddings-->  [Qdrant: Vector DB]
+                                                            |
+                                                            v
+[User Question] --> [n8n: Query Workflow] --> [Ollama: nomic-embed-text]
+                                                            |
+                                                      embed question
+                                                            |
+                                                            v
+                                                   [Qdrant: similarity search]
+                                                            |
+                                                      top-k chunks
+                                                            |
+                                                            v
+                                              [Ollama: llama3] -- generates answer
+                                                            |
+                                                            v
+                                                      [Final Answer]</code></pre>
+
+        <table>
+            <tr><th>Component</th><th>Role</th><th>Why This One</th></tr>
+            <tr><td><strong>n8n</strong></td><td>Workflow orchestration</td><td>Visual builder, 400+ integrations, handles file I/O and HTTP calls</td></tr>
+            <tr><td><strong>Ollama</strong></td><td>Embeddings + LLM inference</td><td>Runs models locally, simple HTTP API, supports embedding and chat models</td></tr>
+            <tr><td><strong>Qdrant</strong></td><td>Vector storage and search</td><td>Purpose-built vector DB, fast similarity search, simple REST API, runs in Docker</td></tr>
+        </table>
+
+        <h2>Prerequisites</h2>
+
+        <p>You need three services running. Here is the fastest path to get all of them up:</p>
+
+        <div class="step">
+            <div class="step-number">PREREQUISITE 1: Ollama with Two Models</div>
+            <pre><code># Install Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Pull the embedding model (this is what converts text to vectors)
+ollama pull nomic-embed-text
+
+# Pull the chat model (this answers questions)
+ollama pull llama3:8b
+
+# Verify both are available
+curl http://localhost:11434/api/tags</code></pre>
+            <p><code>nomic-embed-text</code> produces 768-dimensional vectors and runs on just 2 GB of RAM. It is specifically designed for embedding tasks and outperforms general-purpose models at retrieval. <code>llama3:8b</code> handles the question-answering step.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">PREREQUISITE 2: Qdrant Vector Database</div>
+            <pre><code># Run Qdrant in Docker
+docker run -d --name qdrant \
+  -p 6333:6333 \
+  -p 6334:6334 \
+  -v qdrant_data:/qdrant/storage \
+  qdrant/qdrant
+
+# Verify it is running
+curl http://localhost:6333/collections</code></pre>
+            <p>Qdrant exposes a REST API on port 6333 and a gRPC interface on 6334. We will use the REST API from n8n. The volume mount ensures your vectors survive container restarts.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">PREREQUISITE 3: n8n</div>
+            <pre><code># Run n8n in Docker
+docker run -d --name n8n \
+  -p 5678:5678 \
+  -v n8n_data:/home/node/.n8n \
+  --add-host=host.docker.internal:host-gateway \
+  n8nio/n8n</code></pre>
+            <p>The <code>--add-host</code> flag lets n8n reach Ollama and Qdrant on your host machine. Open <code>http://localhost:5678</code> to access the n8n editor.</p>
+        </div>
+
+        <div class="highlight">
+            <strong>Docker networking tip:</strong> If all three services run in Docker, create a shared network: <code>docker network create rag-net</code> and add <code>--network rag-net</code> to each container. Then use container names as hostnames (e.g., <code>http://qdrant:6333</code>) instead of <code>host.docker.internal</code>.
+        </div>
+
+        <h2>Step-by-Step: Document Ingestion Workflow</h2>
+
+        <p>This workflow takes documents, splits them into chunks, generates embeddings with Ollama, and stores everything in Qdrant. You run it once per document (or on a schedule to ingest new files automatically).</p>
+
+        <div class="step">
+            <div class="step-number">STEP 1: Create the Qdrant Collection</div>
+            <p>Before ingesting documents, create a collection in Qdrant that matches the embedding dimensions. Add an HTTP Request node:</p>
+            <pre><code>// HTTP Request node configuration
+URL: http://localhost:6333/collections/knowledge_base
+Method: PUT
+Body (JSON):
+{
+  "vectors": {
+    "size": 768,
+    "distance": "Cosine"
+  }
+}</code></pre>
+            <p>This creates a collection called <code>knowledge_base</code> with 768 dimensions (matching <code>nomic-embed-text</code> output) using cosine similarity. You only need to run this once.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 2: Read and Chunk the Document</div>
+            <p>Add a <strong>Read Binary File</strong> node (or a webhook that accepts file uploads) followed by a <strong>Code</strong> node that splits the text into overlapping chunks:</p>
+            <pre><code>// Code node: chunk the document
+const text = $input.first().json.data; // or .text depending on source
+const CHUNK_SIZE = 500;    // characters per chunk
+const CHUNK_OVERLAP = 50;  // overlap between chunks
+
+const chunks = [];
+let start = 0;
+
+while (start < text.length) {
+  const end = Math.min(start + CHUNK_SIZE, text.length);
+  const chunk = text.substring(start, end).trim();
+
+  if (chunk.length > 50) { // skip tiny fragments
+    chunks.push({
+      json: {
+        text: chunk,
+        chunk_index: chunks.length,
+        source: $input.first().json.filename || 'document',
+        char_start: start,
+        char_end: end
+      }
+    });
+  }
+
+  start += CHUNK_SIZE - CHUNK_OVERLAP;
+}
+
+return chunks;</code></pre>
+            <p>This produces one output item per chunk. The overlap ensures that sentences split across chunk boundaries are still partially captured in both chunks, improving retrieval accuracy.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 3: Generate Embeddings with Ollama</div>
+            <p>For each chunk, call the Ollama embedding endpoint. Add an HTTP Request node inside a loop (n8n handles this automatically when the previous node outputs multiple items):</p>
+            <pre><code>// HTTP Request node configuration
+URL: http://localhost:11434/api/embeddings
+Method: POST
+Body (JSON):
+{
+  "model": "nomic-embed-text",
+  "prompt": "{{ $json.text }}"
+}
+Options:
+  Timeout: 30000
+  Batch size: 1 (process chunks sequentially to avoid overloading Ollama)</code></pre>
+            <p>The response contains an <code>embedding</code> array of 768 floating-point numbers &mdash; the vector representation of that chunk.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 4: Store in Qdrant</div>
+            <p>Send each chunk's embedding and metadata to Qdrant. Add another HTTP Request node:</p>
+            <pre><code>// HTTP Request node configuration
+URL: http://localhost:6333/collections/knowledge_base/points
+Method: PUT
+Body (JSON):
+{
+  "points": [
+    {
+      "id": {{ $runIndex }},
+      "vector": {{ JSON.stringify($json.embedding) }},
+      "payload": {
+        "text": "{{ $('Code').item.json.text }}",
+        "source": "{{ $('Code').item.json.source }}",
+        "chunk_index": {{ $('Code').item.json.chunk_index }}
+      }
+    }
+  ]
+}</code></pre>
+            <p>Each point stores the vector for similarity search and the original text plus metadata in the payload. The payload is returned with search results, so you can pass the actual text to the LLM later.</p>
+        </div>
+
+        <div class="highlight">
+            <strong>Batch optimization:</strong> For large documents (100+ chunks), batch the Qdrant upserts. Qdrant accepts up to 100 points per request. Collect chunks in a Code node and send them in batches to cut HTTP overhead by 100x.
+        </div>
+
+        <h2>Step-by-Step: Query Workflow</h2>
+
+        <p>Now that your documents are indexed, build a second workflow that accepts a question and returns a grounded answer. This is the "chat with your docs" experience.</p>
+
+        <div class="step">
+            <div class="step-number">STEP 1: Receive the Question</div>
+            <p>Add a <strong>Webhook</strong> node that accepts POST requests with a JSON body containing <code>{"question": "your question here"}</code>. Set the response mode to "Response Node" so you can return the answer.</p>
+            <pre><code>// Webhook configuration
+HTTP Method: POST
+Path: /ask-knowledge-base
+Response Mode: Using 'Respond to Webhook' Node</code></pre>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 2: Embed the Question</div>
+            <p>The question needs to be converted to a vector in the same embedding space as your documents. Use the same Ollama model:</p>
+            <pre><code>// HTTP Request to Ollama
+URL: http://localhost:11434/api/embeddings
+Method: POST
+Body:
+{
+  "model": "nomic-embed-text",
+  "prompt": "{{ $json.body.question }}"
+}</code></pre>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 3: Search Qdrant for Relevant Chunks</div>
+            <p>Send the question's embedding to Qdrant to find the most similar document chunks:</p>
+            <pre><code>// HTTP Request to Qdrant
+URL: http://localhost:6333/collections/knowledge_base/points/search
+Method: POST
+Body:
+{
+  "vector": {{ JSON.stringify($json.embedding) }},
+  "limit": 5,
+  "with_payload": true
+}</code></pre>
+            <p>This returns the top 5 most semantically similar chunks from your knowledge base, along with their text and metadata. The <code>limit: 5</code> parameter controls how many chunks feed into the LLM's context &mdash; more chunks give broader context but cost more processing time.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 4: Build the Context and Generate the Answer</div>
+            <p>Combine the retrieved chunks into a context string, then ask Ollama to answer the question using only that context:</p>
+            <pre><code>// Code node: build context from search results
+const results = $input.first().json.result;
+const context = results
+  .map((r, i) => `[Source ${i+1}: ${r.payload.source}]\n${r.payload.text}`)
+  .join('\n\n---\n\n');
+
+const question = $('Receive Question').first().json.body.question;
+
+return [{
+  json: {
+    context: context,
+    question: question,
+    prompt: `You are a helpful assistant that answers questions based on the provided context documents. Use ONLY the information from the context below. If the context does not contain enough information to answer the question, say "I don't have enough information in the knowledge base to answer this."
+
+CONTEXT:
+${context}
+
+QUESTION: ${question}
+
+Provide a clear, concise answer. Cite which source(s) you used.`
+  }
+}];</code></pre>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 5: Call Ollama for the Final Answer</div>
+            <pre><code>// HTTP Request to Ollama
+URL: http://localhost:11434/api/generate
+Method: POST
+Body:
+{
+  "model": "llama3:8b",
+  "prompt": "{{ $json.prompt }}",
+  "stream": false,
+  "options": {
+    "temperature": 0.3,
+    "num_predict": 1000
+  }
+}</code></pre>
+            <p>Low temperature (0.3) keeps the answer factual and grounded. The model should rely on the retrieved context rather than its training data. Finally, use a <strong>Respond to Webhook</strong> node to return the answer as JSON.</p>
+        </div>
+
+        <h3>Test the Query Workflow</h3>
+
+        <pre><code>curl -X POST http://localhost:5678/webhook/ask-knowledge-base \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What is our refund policy for enterprise customers?"}'</code></pre>
+
+        <p>Expected response:</p>
+
+        <pre><code>{
+  "answer": "Based on the knowledge base, enterprise customers are eligible for a full refund within 60 days of purchase. After 60 days, refunds are prorated based on the remaining contract term. [Source 2: refund-policy.pdf]",
+  "sources": ["refund-policy.pdf", "enterprise-terms.pdf"],
+  "chunks_used": 3
+}</code></pre>
+
+        <h2>The Workflow JSON</h2>
+
+        <p>Here is a complete, importable n8n workflow for the query pipeline. Copy and paste this into n8n via <em>Workflow &rarr; Import from JSON</em>.</p>
+
+        <details class="json-toggle">
+            <summary>Click to expand the RAG Query Workflow JSON</summary>
+            <pre><code>{
+  "name": "RAG Knowledge Base Query (Ollama + Qdrant)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ask-knowledge-base",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-question",
+      "name": "Receive Question",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "ask-knowledge-base"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/embeddings",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'nomic-embed-text', prompt: $json.body.question }) }}",
+        "options": { "timeout": 30000 }
+      },
+      "id": "embed-question",
+      "name": "Embed Question (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:6333/collections/knowledge_base/points/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ vector: $json.embedding, limit: 5, with_payload: true }) }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "search-qdrant",
+      "name": "Search Qdrant",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.result || [];\nconst context = results.map((r, i) => `[Source ${i+1}: ${r.payload.source}]\\n${r.payload.text}`).join('\\n\\n---\\n\\n');\nconst question = $('Receive Question').first().json.body.question;\nreturn [{ json: { context, question, sources: results.map(r => r.payload.source), prompt: `You are a helpful assistant. Answer the question using ONLY the context below. If the context does not contain enough information, say so.\\n\\nCONTEXT:\\n${context}\\n\\nQUESTION: ${question}\\n\\nProvide a clear, concise answer and cite your sources.` } }];"
+      },
+      "id": "build-prompt",
+      "name": "Build RAG Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3:8b', prompt: $json.prompt, stream: false, options: { temperature: 0.3, num_predict: 1000 } }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "generate-answer",
+      "name": "Generate Answer (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ answer: $json.response, sources: $('Build RAG Prompt').first().json.sources, question: $('Build RAG Prompt').first().json.question }) }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Return Answer",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Receive Question": {
+      "main": [[{ "node": "Embed Question (Ollama)", "type": "main", "index": 0 }]]
+    },
+    "Embed Question (Ollama)": {
+      "main": [[{ "node": "Search Qdrant", "type": "main", "index": 0 }]]
+    },
+    "Search Qdrant": {
+      "main": [[{ "node": "Build RAG Prompt", "type": "main", "index": 0 }]]
+    },
+    "Build RAG Prompt": {
+      "main": [[{ "node": "Generate Answer (Ollama)", "type": "main", "index": 0 }]]
+    },
+    "Generate Answer (Ollama)": {
+      "main": [[{ "node": "Return Answer", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "AI" }, { "name": "RAG" }, { "name": "Ollama" }, { "name": "Qdrant" }]
+}</code></pre>
+        </details>
+
+        <h2>Tips for Production</h2>
+
+        <p>The workflow above gets you a working RAG system. Here is how to make it production-grade:</p>
+
+        <h3>Chunk Sizing Strategy</h3>
+        <p>The 500-character default works well for general documents. Tune it based on your content:</p>
+        <ul>
+            <li><strong>Technical documentation</strong> &mdash; Use 300&ndash;400 characters with 100-char overlap. Shorter chunks give more precise retrieval for specific API details or config values.</li>
+            <li><strong>Long-form reports and policies</strong> &mdash; Use 800&ndash;1200 characters with 150-char overlap. Longer chunks preserve paragraph-level context that the LLM needs for nuanced answers.</li>
+            <li><strong>FAQ/Q&A content</strong> &mdash; Chunk by question-answer pair rather than by character count. Each Q&A should be a single chunk.</li>
+        </ul>
+
+        <h3>Model Selection</h3>
+        <table>
+            <tr><th>Task</th><th>Recommended Model</th><th>RAM</th><th>Notes</th></tr>
+            <tr><td>Embeddings</td><td><code>nomic-embed-text</code></td><td>2 GB</td><td>Best quality-to-size ratio for retrieval. 768 dimensions.</td></tr>
+            <tr><td>Embeddings (faster)</td><td><code>all-minilm</code></td><td>1 GB</td><td>384 dimensions. Faster but lower retrieval accuracy.</td></tr>
+            <tr><td>Answer generation</td><td><code>llama3:8b</code></td><td>8 GB</td><td>Strong instruction-following, good at citing sources.</td></tr>
+            <tr><td>Answer generation (better)</td><td><code>llama3:70b</code></td><td>48 GB</td><td>Near cloud-API quality. Requires serious hardware.</td></tr>
+        </table>
+
+        <h3>Memory and Performance</h3>
+        <ul>
+            <li><strong>Set HTTP timeouts to 120 seconds</strong> &mdash; The answer generation step can take 30&ndash;90 seconds depending on context size and hardware. Default n8n timeouts will kill the request prematurely.</li>
+            <li><strong>Process ingestion in batches</strong> &mdash; When embedding hundreds of chunks, add a <code>Wait</code> node (200ms) between Ollama calls to prevent memory spikes. Ollama queues requests, but rapid-fire calls can exhaust RAM.</li>
+            <li><strong>Use Qdrant's payload indexing</strong> &mdash; If you query by source file or date, create payload indexes: <code>PUT /collections/knowledge_base/index</code> with <code>{"field_name": "source", "field_schema": "keyword"}</code>. This speeds up filtered searches dramatically.</li>
+            <li><strong>Monitor Qdrant collection size</strong> &mdash; Check with <code>GET /collections/knowledge_base</code>. Qdrant handles millions of vectors, but keep an eye on disk usage. Each 768-dim vector uses roughly 3 KB of storage.</li>
+        </ul>
+
+        <h3>Improving Answer Quality</h3>
+        <ul>
+            <li><strong>Increase top-k for broad questions</strong> &mdash; If answers feel incomplete, raise the Qdrant <code>limit</code> from 5 to 8 or 10. More context chunks give the LLM more to work with.</li>
+            <li><strong>Add a relevance threshold</strong> &mdash; Filter Qdrant results by score. If the best match has a score below 0.6, the knowledge base probably does not contain relevant information. Return "I don't have enough information" instead of forcing a bad answer.</li>
+            <li><strong>Re-rank results</strong> &mdash; For advanced setups, add a second Ollama call that re-ranks the top-k chunks by relevance to the specific question before feeding them into the answer prompt.</li>
+        </ul>
+
+        <div class="highlight">
+            <strong>Common pitfall:</strong> If the LLM ignores your context and answers from its training data, add stronger instruction language: "You MUST answer using ONLY the provided context. Do NOT use any prior knowledge. If the context is insufficient, explicitly state that." Lower temperature to 0.1&ndash;0.2 also helps.
+        </div>
+
+        <div class="cta">
+            <h3>Want Production-Ready RAG + 10 More Workflows?</h3>
+            <p>The <strong>Self-Hosted AI Workflow Pack</strong> includes a polished RAG pipeline with multi-format document ingestion, batch processing, error handling, and 10 more AI workflows for content generation, email automation, lead scoring, and document processing &mdash; all running locally with Ollama.</p>
+            <a href="https://buy.stripe.com/28EaEXdSJ1I67WbaivabK0c" class="btn">Get All 11 Workflows &mdash; $39</a>
+            <p style="margin-top: 1rem; color: var(--muted); font-size: 0.85rem;">One-time purchase. No subscriptions. No API costs. 30-day money-back guarantee.</p>
+        </div>
+
+        <h3>Free Samples</h3>
+        <p>Try before you buy &mdash; grab free, open-source n8n + Ollama workflow templates:</p>
+        <ul>
+            <li><a href="https://github.com/bonskari/n8n-ai-workflows">Free: n8n AI Workflow Samples on GitHub</a></li>
+        </ul>
+
+        <h3>Further Reading</h3>
+        <ul>
+            <li><a href="self-hosted-ai-workflows-n8n-ollama.html">How to Build Self-Hosted AI Workflows with n8n and Ollama (2026 Guide)</a></li>
+            <li><a href="n8n-ollama-tutorial-local-ai-automation.html">n8n + Ollama Tutorial: Automate Everything with Local AI</a></li>
+            <li><a href="automate-email-responses-n8n-ollama.html">Automate Email Responses with n8n + Ollama</a></li>
+            <li><a href="n8n-ai-lead-scoring-ollama-workflow.html">AI Lead Scoring with n8n + Ollama</a></li>
+        </ul>
+    </article>
+
+    <footer>
+        <p>Published by <a href="../">WorkflowForge</a></p>
+    </footer>
+</div>
+</body>
+</html>
