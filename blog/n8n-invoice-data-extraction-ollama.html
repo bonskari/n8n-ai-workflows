@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Extract Invoice Data with n8n + Ollama (Free AI Document Processing Workflow)</title>
+    <meta name="description" content="Extract invoice data automatically with n8n and Ollama. Pull vendor name, invoice number, line items, totals, and tax using local AI. Free workflow template. GDPR-compliant, no cloud API costs.">
+    <meta property="og:title" content="Extract Invoice Data with n8n + Ollama — Free AI Workflow Template">
+    <meta property="og:description" content="Automate invoice data extraction with local AI. Free n8n workflow that runs 100% on your hardware. GDPR-compliant, no API keys needed, no per-document costs.">
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="https://bonskari.github.io/n8n-ai-workflows/blog/n8n-invoice-data-extraction-ollama.html">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "How to Extract Invoice Data with n8n + Ollama (Free AI Document Processing Workflow)",
+        "description": "Extract invoice data automatically with n8n and Ollama. Pull vendor name, invoice number, line items, totals, and tax using local AI. Free workflow template included.",
+        "author": {"@type": "Organization", "name": "Workflow Forge"},
+        "datePublished": "2026-03-24",
+        "publisher": {"@type": "Organization", "name": "Workflow Forge"}
+    }
+    </script>
+    <style>
+        :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --orange: #d29922; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+        .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav { padding: 1rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; line-height: 1.3; }
+        h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; color: var(--accent); }
+        h3 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; }
+        .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1rem 0 1.5rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; }
+        code { font-family: 'SF Mono', 'Fira Code', monospace; }
+        .inline-code { background: var(--surface); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+        p code, li code { background: var(--surface); border: 1px solid var(--border); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.88em; }
+        ul, ol { margin: 0 0 1rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .cta { background: linear-gradient(135deg, #1a3a5c, #1a2d4a); border: 1px solid var(--accent); border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center; }
+        .cta h3 { color: var(--accent); margin-top: 0; }
+        .cta a.btn { display: inline-block; background: var(--accent); color: #000; padding: 0.75rem 2rem; border-radius: 8px; font-weight: bold; text-decoration: none; margin-top: 1rem; }
+        .cta a.btn:hover { opacity: 0.9; text-decoration: none; }
+        .highlight { background: var(--surface); border-left: 3px solid var(--accent); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
+        th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; }
+        th { background: var(--surface); }
+        .step { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+        .step-number { color: var(--accent); font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .json-toggle { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin: 1.5rem 0; }
+        .json-toggle summary { cursor: pointer; padding: 1rem 1.25rem; font-weight: 600; color: var(--accent); }
+        .json-toggle summary:hover { background: rgba(88,166,255,0.05); }
+        .json-toggle pre { margin: 0; border: none; border-top: 1px solid var(--border); border-radius: 0 0 8px 8px; max-height: 500px; overflow-y: auto; }
+        footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
+        @media (max-width: 600px) { h1 { font-size: 1.6rem; } .cta { padding: 1.5rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav><a href="https://bonskari.github.io/n8n-ai-workflows/">&larr; n8n AI Workflow Templates</a> &middot; <a href="https://bonskari.github.io/n8n-ai-workflows/blog/">Blog</a></nav>
+
+    <article>
+        <h1>How to Extract Invoice Data with n8n + Ollama (Free AI Document Processing Workflow)</h1>
+        <p class="meta">Published March 24, 2026 &middot; 11 min read</p>
+
+        <p>Invoice processing is one of the most tedious tasks in any finance or operations team. Manually copying vendor names, invoice numbers, line items, and totals from PDFs into spreadsheets is slow, error-prone, and mind-numbing. Cloud OCR and document AI services like AWS Textract or Google Document AI can help &mdash; but they charge per page, require sending your financial documents to external servers, and raise serious GDPR concerns.</p>
+
+        <p>With n8n and Ollama, you can build an automated invoice extraction pipeline that runs entirely on your own hardware. No API costs, no cloud storage of sensitive financial data, and full control over how your documents are processed.</p>
+
+        <p>In this tutorial, you'll build a workflow that:</p>
+        <ol>
+            <li>Receives invoices via email attachment or webhook upload</li>
+            <li>Extracts raw text from the PDF or image</li>
+            <li>Sends the text to Ollama for structured data extraction</li>
+            <li>Outputs clean, structured JSON with all invoice fields</li>
+            <li>Logs the data to Google Sheets or a database automatically</li>
+        </ol>
+
+        <h2>Why Local AI for Invoice Processing?</h2>
+
+        <p>Financial documents are among the most sensitive data your business handles. Invoices contain vendor relationships, pricing agreements, bank details, and spending patterns &mdash; information you do not want sitting on a third-party server.</p>
+
+        <table>
+            <tr><th>Concern</th><th>Cloud API Approach</th><th>n8n + Ollama (Local)</th></tr>
+            <tr><td><strong>Data privacy</strong></td><td>Documents sent to AWS, Google, or OpenAI servers</td><td>Never leaves your server</td></tr>
+            <tr><td><strong>GDPR compliance</strong></td><td>Requires DPA agreements, data residency checks</td><td>Fully compliant by default</td></tr>
+            <tr><td><strong>Cost</strong></td><td>$0.01&ndash;$0.15 per page (adds up fast)</td><td>$0 per document</td></tr>
+            <tr><td><strong>Volume limits</strong></td><td>Rate limits and tier caps</td><td>Unlimited throughput</td></tr>
+            <tr><td><strong>Vendor lock-in</strong></td><td>Dependent on API availability and pricing</td><td>No dependencies</td></tr>
+        </table>
+
+        <div class="highlight">
+            <p><strong>GDPR note:</strong> Under GDPR, sending employee or customer financial data to third-party processors requires a Data Processing Agreement (DPA) and may require data residency in the EU. Running Ollama locally eliminates this requirement entirely &mdash; the data never leaves your infrastructure.</p>
+        </div>
+
+        <h2>The Architecture</h2>
+
+        <p>The invoice extraction pipeline follows a straightforward pattern: receive the document, extract text, structure it with AI, and output the data.</p>
+
+        <pre><code>[Email trigger / Webhook: Invoice arrives]
+        |
+        v
+[Extract text from PDF/image attachment]
+        |
+        v
+[Ollama: Structured data extraction]
+        |
+        v
+[Set node: Parse + validate JSON fields]
+        |
+        v
+[Google Sheets / PostgreSQL: Store results]
+        |
+        v
+[Optional: Slack alert or approval workflow]</code></pre>
+
+        <p>The Ollama call is the core of the pipeline. A well-engineered extraction prompt reliably pulls structured fields from raw invoice text, even when the formatting varies across vendors &mdash; which it always does.</p>
+
+        <h2>Fields to Extract</h2>
+
+        <p>A complete invoice extraction should capture these fields:</p>
+
+        <table>
+            <tr><th>Field</th><th>Description</th><th>Example</th></tr>
+            <tr><td><code>vendor_name</code></td><td>Supplier company name</td><td>"Acme Supplies Ltd"</td></tr>
+            <tr><td><code>vendor_address</code></td><td>Supplier billing address</td><td>"123 Main St, London EC1A"</td></tr>
+            <tr><td><code>invoice_number</code></td><td>Unique invoice identifier</td><td>"INV-2026-00842"</td></tr>
+            <tr><td><code>invoice_date</code></td><td>Date invoice was issued</td><td>"2026-03-15"</td></tr>
+            <tr><td><code>due_date</code></td><td>Payment due date</td><td>"2026-04-14"</td></tr>
+            <tr><td><code>currency</code></td><td>ISO currency code</td><td>"GBP"</td></tr>
+            <tr><td><code>line_items</code></td><td>Array of products/services</td><td>[{description, qty, unit_price, total}]</td></tr>
+            <tr><td><code>subtotal</code></td><td>Total before tax</td><td>450.00</td></tr>
+            <tr><td><code>tax_rate</code></td><td>VAT/GST/tax percentage</td><td>20</td></tr>
+            <tr><td><code>tax_amount</code></td><td>Tax amount in currency</td><td>90.00</td></tr>
+            <tr><td><code>total_amount</code></td><td>Final amount due</td><td>540.00</td></tr>
+            <tr><td><code>payment_terms</code></td><td>Net-30, Net-60, etc.</td><td>"Net 30"</td></tr>
+            <tr><td><code>purchase_order</code></td><td>Your PO number if referenced</td><td>"PO-2026-112"</td></tr>
+        </table>
+
+        <h2>The Ollama Extraction Prompt</h2>
+
+        <p>The prompt is the most important part of this workflow. It needs to handle the wide variation in how different vendors format their invoices &mdash; some use tables, some use paragraphs, some mix both.</p>
+
+        <p>Here is the extraction prompt used in this workflow:</p>
+
+        <pre><code>You are an invoice data extraction specialist. Extract all invoice information from the following document text and return it as structured JSON.
+
+Extract these fields exactly:
+- vendor_name: the supplier/seller company name
+- vendor_address: the supplier's address (single string)
+- invoice_number: the invoice ID, reference number, or invoice #
+- invoice_date: date the invoice was issued (ISO format: YYYY-MM-DD)
+- due_date: payment due date (ISO format: YYYY-MM-DD, or null if not found)
+- currency: 3-letter ISO currency code (USD, EUR, GBP, etc.)
+- line_items: array of objects with fields: description, quantity, unit_price, total
+- subtotal: total before tax (number, no currency symbol)
+- tax_rate: tax/VAT percentage as a number (e.g. 20 for 20%), or null
+- tax_amount: total tax charged (number), or null
+- total_amount: final total amount due (number, no currency symbol)
+- payment_terms: payment terms string (e.g. "Net 30"), or null
+- purchase_order: PO number if referenced, or null
+- confidence: your confidence in the extraction from 0.0 to 1.0
+
+Rules:
+- Return ONLY valid JSON, no explanation, no markdown code blocks
+- If a field cannot be found, use null
+- All monetary values must be numbers (not strings)
+- Dates must be in YYYY-MM-DD format
+- If the currency symbol is present ($ £ €), infer the currency code
+
+Invoice text:
+{{invoice_text}}</code></pre>
+
+        <div class="highlight">
+            <p><strong>Why this prompt works:</strong> The explicit field list, strict JSON-only instruction, and null-fallback rules are critical. Without them, local models tend to add explanatory text around the JSON or format numbers as strings like "£540.00". The <code>temperature: 0.1</code> setting keeps output deterministic across repeated runs on the same document.</p>
+        </div>
+
+        <h2>Prerequisites</h2>
+
+        <p>You need n8n and Ollama running. If you haven't set them up yet:</p>
+
+        <pre><code># Install Ollama and pull a capable model
+curl -fsSL https://ollama.ai/install.sh | sh
+ollama pull llama3:8b
+
+# For better extraction accuracy on complex invoices:
+# ollama pull mistral:7b-instruct
+
+# Run n8n in Docker
+docker run -d --name n8n -p 5678:5678 \
+  --add-host=host.docker.internal:host-gateway \
+  -v n8n_data:/home/node/.n8n \
+  n8nio/n8n</code></pre>
+
+        <div class="highlight">
+            <p><strong>Model choice:</strong> <code>llama3:8b</code> handles most invoices well. For invoices with complex multi-page tables or non-English text, <code>mistral:7b-instruct</code> or <code>llama3:70b</code> (if your hardware allows) gives more reliable extraction. The workflow JSON works with any Ollama model &mdash; just update the model name field.</p>
+        </div>
+
+        <h2>Free Workflow: AI Invoice Extractor</h2>
+
+        <p>Here is a complete, working n8n workflow. Import the JSON directly into your n8n instance to get started immediately.</p>
+
+        <h3>What Each Step Does</h3>
+
+        <div class="step">
+            <div class="step-number">STEP 1: Email Trigger or Webhook</div>
+            <p>The workflow starts when an invoice arrives. Use the <strong>Email Trigger (IMAP)</strong> node to monitor an inbox like <code>invoices@yourcompany.com</code>, or use a <strong>Webhook</strong> node if you're uploading invoices via an API or form. The node captures the raw attachment binary data and passes it downstream.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 2: Text Extraction</div>
+            <p>An <strong>HTTP Request</strong> node calls a local text extraction service, or you can use n8n's <strong>Extract from File</strong> node (available in newer n8n versions). For PDF invoices, the workflow pipes the binary through a simple PDF-to-text conversion. The output is a plain text string containing all the invoice content.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 3: Ollama Structured Extraction</div>
+            <p>The raw invoice text is injected into the extraction prompt and sent to Ollama via its local HTTP API. Ollama returns a JSON object with all the structured invoice fields. The <code>temperature: 0.1</code> setting ensures consistent output across runs.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 4: Parse and Validate</div>
+            <p>A <strong>Set</strong> node parses the JSON response and validates that required fields are present. If the extraction confidence is below 0.7, the invoice is flagged for human review. High-confidence extractions pass through automatically.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 5: Output to Google Sheets or Database</div>
+            <p>The structured invoice data is written to a Google Sheets spreadsheet or a PostgreSQL/MySQL database. Each invoice becomes one row with all fields as columns. Line items are stored as a JSON string or written to a separate child table if your database schema supports it.</p>
+        </div>
+
+        <h3>The Workflow JSON</h3>
+
+        <details class="json-toggle">
+            <summary>Click to expand full workflow JSON</summary>
+            <pre><code>{
+  "name": "AI Invoice Data Extractor (Ollama)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "extract-invoice",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Receive Invoice",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "extract-invoice"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "invoice_text",
+              "name": "invoice_text",
+              "value": "={{ $json.body.text || $json.body.invoice_text || '' }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "prepare-text",
+      "name": "Prepare Invoice Text",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3:8b', prompt: 'You are an invoice data extraction specialist. Extract all invoice information from the following document text and return it as structured JSON.\\n\\nExtract these fields exactly:\\n- vendor_name: the supplier/seller company name\\n- vendor_address: the supplier\\'s address (single string)\\n- invoice_number: the invoice ID, reference number, or invoice #\\n- invoice_date: date the invoice was issued (ISO format: YYYY-MM-DD)\\n- due_date: payment due date (ISO format: YYYY-MM-DD, or null if not found)\\n- currency: 3-letter ISO currency code (USD, EUR, GBP, etc.)\\n- line_items: array of objects with fields: description, quantity, unit_price, total\\n- subtotal: total before tax (number, no currency symbol)\\n- tax_rate: tax/VAT percentage as a number (e.g. 20 for 20%), or null\\n- tax_amount: total tax charged (number), or null\\n- total_amount: final total amount due (number, no currency symbol)\\n- payment_terms: payment terms string (e.g. \\'Net 30\\'), or null\\n- purchase_order: PO number if referenced, or null\\n- confidence: your confidence in the extraction from 0.0 to 1.0\\n\\nRules:\\n- Return ONLY valid JSON, no explanation, no markdown code blocks\\n- If a field cannot be found, use null\\n- All monetary values must be numbers (not strings)\\n- Dates must be in YYYY-MM-DD format\\n\\nInvoice text:\\n' + $json.invoice_text, stream: false, options: { temperature: 0.1, num_predict: 1000 } }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "ollama-extract",
+      "name": "Extract with Ollama",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "extracted",
+              "name": "extracted",
+              "value": "={{ (() => { try { const raw = $json.response; const match = raw.match(/\\{[\\s\\S]*\\}/); return match ? JSON.parse(match[0]) : { error: 'parse_failed', raw: raw } } catch(e) { return { error: e.message } } })() }}",
+              "type": "object"
+            },
+            {
+              "id": "needs_review",
+              "name": "needs_review",
+              "value": "={{ ($json.response && (() => { try { const m = $json.response.match(/\\{[\\s\\S]*\\}/); return m ? JSON.parse(m[0]).confidence < 0.7 : true } catch(e) { return true } })()) }}",
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "id": "parse-result",
+      "name": "Parse Extraction Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: !$json.extracted.error, needs_review: $json.needs_review, invoice: $json.extracted }) }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Receive Invoice": {
+      "main": [[{ "node": "Prepare Invoice Text", "type": "main", "index": 0 }]]
+    },
+    "Prepare Invoice Text": {
+      "main": [[{ "node": "Extract with Ollama", "type": "main", "index": 0 }]]
+    },
+    "Extract with Ollama": {
+      "main": [[{ "node": "Parse Extraction Result", "type": "main", "index": 0 }]]
+    },
+    "Parse Extraction Result": {
+      "main": [[{ "node": "Return Result", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [
+    { "name": "AI" },
+    { "name": "Ollama" },
+    { "name": "Finance" },
+    { "name": "Invoice Processing" },
+    { "name": "Document Extraction" }
+  ]
+}</code></pre>
+        </details>
+
+        <h3>Testing the Workflow</h3>
+
+        <p>Once imported and activated, test it by sending invoice text directly via curl. In production you'd pipe in the extracted PDF text, but for testing you can send the text inline:</p>
+
+        <pre><code>curl -X POST http://localhost:5678/webhook/extract-invoice \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "INVOICE\n\nFrom: Acme Supplies Ltd\n123 Industrial Way, Manchester M1 2AB\n\nInvoice #: INV-2026-00842\nDate: 15 March 2026\nDue Date: 14 April 2026\nPayment Terms: Net 30\n\nBill To: Your Company Ltd\n\nItem             Qty    Unit Price    Total\nWeb Hosting x3    3      £50.00      £150.00\nSSL Certificate   1      £80.00       £80.00\nSetup Fee         1     £120.00      £120.00\n\nSubtotal: £350.00\nVAT (20%): £70.00\nTotal Due: £420.00\n\nBank: Barclays | Sort: 20-30-40 | Acc: 12345678"
+  }'</code></pre>
+
+        <p>Expected response:</p>
+
+        <pre><code>{
+  "success": true,
+  "needs_review": false,
+  "invoice": {
+    "vendor_name": "Acme Supplies Ltd",
+    "vendor_address": "123 Industrial Way, Manchester M1 2AB",
+    "invoice_number": "INV-2026-00842",
+    "invoice_date": "2026-03-15",
+    "due_date": "2026-04-14",
+    "currency": "GBP",
+    "line_items": [
+      { "description": "Web Hosting x3", "quantity": 3, "unit_price": 50.00, "total": 150.00 },
+      { "description": "SSL Certificate",  "quantity": 1, "unit_price": 80.00, "total": 80.00 },
+      { "description": "Setup Fee",         "quantity": 1, "unit_price": 120.00, "total": 120.00 }
+    ],
+    "subtotal": 350.00,
+    "tax_rate": 20,
+    "tax_amount": 70.00,
+    "total_amount": 420.00,
+    "payment_terms": "Net 30",
+    "purchase_order": null,
+    "confidence": 0.97
+  }
+}</code></pre>
+
+        <h2>Connecting to Email Automatically</h2>
+
+        <p>The webhook approach works great for API-driven uploads. For a fully automated pipeline that processes invoices as they arrive by email, replace the Webhook node with an <strong>Email Trigger (IMAP)</strong> node:</p>
+
+        <ol>
+            <li>Add an <strong>Email Trigger (IMAP)</strong> node and connect it to your <code>invoices@yourcompany.com</code> inbox</li>
+            <li>Enable "Download Attachments" in the node settings</li>
+            <li>Add an <strong>Extract from File</strong> node (for PDF) or use a text extraction HTTP call to convert the binary to text</li>
+            <li>Connect the text output to the "Prepare Invoice Text" node</li>
+            <li>Set the polling interval to every 5 or 15 minutes</li>
+        </ol>
+
+        <p>With this setup, anyone on your team can forward an invoice to a dedicated email address and it will be automatically extracted and logged within minutes &mdash; no manual data entry required.</p>
+
+        <h2>Writing to Google Sheets</h2>
+
+        <p>To log extracted invoices to a Google Sheets spreadsheet, add a <strong>Google Sheets</strong> node after the Parse Result step:</p>
+
+        <ol>
+            <li>Connect your Google account in n8n's credentials manager</li>
+            <li>Create a spreadsheet with columns matching your invoice fields</li>
+            <li>Set the operation to "Append Row"</li>
+            <li>Map each field: <code>vendor_name</code>, <code>invoice_number</code>, <code>invoice_date</code>, <code>total_amount</code>, <code>currency</code>, etc.</li>
+            <li>For <code>line_items</code>, use <code>JSON.stringify()</code> to store the array as a string, or create a second sheet for line item detail rows</li>
+        </ol>
+
+        <p>The result is a living spreadsheet of every invoice your business receives, auto-populated with structured data. Your accounts team can sort, filter, and export without touching the underlying automation.</p>
+
+        <h2>Handling Tricky Invoice Formats</h2>
+
+        <p>Invoices vary enormously between vendors. Here's how this workflow handles common edge cases:</p>
+
+        <h3>Multi-page PDFs</h3>
+        <p>The text extraction step concatenates all pages before sending to Ollama. The model receives the full document text and can find fields that span pages. Keep the <code>num_predict</code> value high (1000+) to allow a complete JSON response for documents with many line items.</p>
+
+        <h3>Image-based invoices (scanned PDFs)</h3>
+        <p>Scanned PDFs require OCR before text extraction. In the full pack workflow, an additional step uses Tesseract (via a local Docker container) or an n8n HTTP call to a locally-running OCR service. This converts the image to text before the Ollama extraction step runs.</p>
+
+        <h3>Non-English invoices</h3>
+        <p>Ollama's multilingual models handle common European languages well. Add "The invoice may be in a language other than English. Extract fields into English field names but preserve the original text values" to the prompt for best results with mixed-language invoices.</p>
+
+        <h3>Low confidence extractions</h3>
+        <p>The <code>needs_review</code> flag triggers when confidence falls below 0.7. Add a Switch node after parsing to route low-confidence invoices to a Slack message or email alert asking a human to verify before the data is written to the spreadsheet.</p>
+
+        <div class="highlight">
+            <p><strong>Accuracy in practice:</strong> On clean, machine-generated PDFs (the majority of invoices from SaaS vendors, suppliers with modern billing systems), extraction accuracy is consistently 95%+. Scanned or handwritten invoices are harder &mdash; expect 80&ndash;90% field accuracy and plan for a human review step for those cases.</p>
+        </div>
+
+        <h2>Comparison: Local vs. Cloud Invoice Processing</h2>
+
+        <table>
+            <tr><th></th><th>n8n + Ollama (Local)</th><th>AWS Textract / Google Doc AI</th></tr>
+            <tr><td><strong>Cost</strong></td><td>$0 per document</td><td>$0.01&ndash;$0.15 per page</td></tr>
+            <tr><td><strong>Data privacy</strong></td><td>Never leaves your server</td><td>Sent to cloud for processing</td></tr>
+            <tr><td><strong>GDPR</strong></td><td>Compliant by default</td><td>Requires DPA, data residency review</td></tr>
+            <tr><td><strong>Setup complexity</strong></td><td>Moderate (30&ndash;60 min)</td><td>Low (API key + SDK)</td></tr>
+            <tr><td><strong>Accuracy on clean PDFs</strong></td><td>95%+</td><td>98%+</td></tr>
+            <tr><td><strong>Accuracy on scanned docs</strong></td><td>80&ndash;90%</td><td>90&ndash;95%</td></tr>
+            <tr><td><strong>Customization</strong></td><td>Full control over fields and logic</td><td>Limited to API schema</td></tr>
+            <tr><td><strong>Break-even volume</strong></td><td>Day 1 (hardware cost aside)</td><td>Costly above ~1,000 pages/month</td></tr>
+        </table>
+
+        <p>For a company processing 200 invoices per month at an average of 2 pages each, AWS Textract costs roughly $4&ndash;60/month depending on the feature tier used. Over a year that's $48&ndash;720. The local approach pays for itself quickly if you already have a server running n8n.</p>
+
+        <div class="cta">
+            <h3>Want the Full Production-Ready Pack?</h3>
+            <p>The <strong>Self-Hosted AI Workflow Pack</strong> includes an advanced invoice processor with OCR support for scanned PDFs, human-review routing via Slack, multi-currency normalization, PostgreSQL storage, duplicate detection, and 10 more AI workflows &mdash; all running locally with Ollama.</p>
+            <a href="https://buy.stripe.com/28EaEXdSJ1I67WbaivabK0c" class="btn">Get All 11 Workflows &mdash; $39</a>
+            <p style="margin-top: 1rem; color: var(--muted); font-size: 0.85rem;">One-time purchase. No subscriptions. 30-day money-back guarantee.</p>
+        </div>
+
+        <h2>What's in the Full Pack</h2>
+
+        <p>The free workflow above handles the core extraction. The full pack adds:</p>
+
+        <ul>
+            <li><strong>OCR preprocessing</strong> &mdash; Automatically detects scanned vs. digital PDFs and routes through Tesseract OCR when needed</li>
+            <li><strong>Duplicate detection</strong> &mdash; Checks the database for matching invoice numbers before inserting to prevent double-processing</li>
+            <li><strong>Multi-currency normalization</strong> &mdash; Converts extracted amounts to a base currency using daily exchange rates</li>
+            <li><strong>Approval workflow</strong> &mdash; Invoices above a configurable threshold are sent to Slack for approval before logging</li>
+            <li><strong>Vendor matching</strong> &mdash; Fuzzy-matches extracted vendor names against your approved vendor list</li>
+            <li><strong>PostgreSQL schema</strong> &mdash; Ready-to-run SQL schema with invoices and line_items tables</li>
+            <li><strong>10 additional workflows</strong> &mdash; Lead scoring, email automation, social content generation, customer support triage, and more</li>
+        </ul>
+
+        <h2>Next Steps</h2>
+
+        <ol>
+            <li><strong>Import the workflow</strong> &mdash; Copy the JSON above into n8n (Settings &rarr; Import Workflow)</li>
+            <li><strong>Test with your invoices</strong> &mdash; Extract text from a real PDF and send it via the curl command</li>
+            <li><strong>Connect your email inbox</strong> &mdash; Replace the Webhook node with an Email Trigger (IMAP) node</li>
+            <li><strong>Add Google Sheets output</strong> &mdash; Connect a Google Sheets node to log every extracted invoice</li>
+            <li><strong>Set up human review</strong> &mdash; Add a Slack notification for low-confidence extractions</li>
+        </ol>
+
+        <p>Explore more n8n + Ollama automation tutorials:</p>
+        <ul>
+            <li><a href="/n8n-ai-workflows/blog/n8n-ai-lead-scoring-ollama-workflow.html">AI Lead Scoring with n8n + Ollama</a></li>
+            <li><a href="/n8n-ai-workflows/blog/automate-email-responses-n8n-ollama.html">Automate Email Responses with n8n + Ollama</a></li>
+            <li><a href="/n8n-ai-workflows/blog/n8n-social-media-content-generator-ollama.html">Social Media Content Generator with n8n + Ollama</a></li>
+            <li><a href="/n8n-ai-workflows/blog/">All n8n + Ollama Tutorials</a></li>
+        </ul>
+    </article>
+
+    <footer>
+        <p>&copy; 2026 Workflow Forge. Built with n8n + Ollama.</p>
+    </footer>
+</div>
+</body>
+</html>

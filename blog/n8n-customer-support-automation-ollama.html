@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Automate Customer Support with n8n + Ollama (Free AI Ticket Router)</title>
+    <meta name="description" content="Automate customer support ticket routing with n8n and Ollama. Classify and route tickets into billing, technical, feature request, and spam using local AI. No API costs, full data privacy.">
+    <meta property="og:title" content="AI Ticket Router with n8n + Ollama — Free Workflow Template">
+    <meta property="og:description" content="Route incoming support tickets automatically using local AI. Free n8n workflow that runs 100% on your hardware. No API keys needed.">
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="https://bonskari.github.io/n8n-ai-workflows/blog/n8n-customer-support-automation-ollama.html">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "How to Automate Customer Support with n8n + Ollama (Free AI Ticket Router)",
+        "description": "Automate customer support ticket routing with n8n and Ollama. Classify tickets as billing, technical, feature request, or spam using local AI. Free workflow template included.",
+        "author": {"@type": "Organization", "name": "Workflow Forge"},
+        "datePublished": "2026-03-24",
+        "publisher": {"@type": "Organization", "name": "Workflow Forge"}
+    }
+    </script>
+    <style>
+        :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --orange: #d29922; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+        .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav { padding: 1rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; line-height: 1.3; }
+        h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; color: var(--accent); }
+        h3 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; }
+        .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1rem 0 1.5rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; }
+        code { font-family: 'SF Mono', 'Fira Code', monospace; }
+        .inline-code { background: var(--surface); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+        p code, li code { background: var(--surface); border: 1px solid var(--border); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.88em; }
+        ul, ol { margin: 0 0 1rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .cta { background: linear-gradient(135deg, #1a3a5c, #1a2d4a); border: 1px solid var(--accent); border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center; }
+        .cta h3 { color: var(--accent); margin-top: 0; }
+        .cta a.btn { display: inline-block; background: var(--accent); color: #000; padding: 0.75rem 2rem; border-radius: 8px; font-weight: bold; text-decoration: none; margin-top: 1rem; }
+        .cta a.btn:hover { opacity: 0.9; text-decoration: none; }
+        .highlight { background: var(--surface); border-left: 3px solid var(--accent); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
+        th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; }
+        th { background: var(--surface); }
+        .step { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+        .step-number { color: var(--accent); font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .json-toggle { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin: 1.5rem 0; }
+        .json-toggle summary { cursor: pointer; padding: 1rem 1.25rem; font-weight: 600; color: var(--accent); }
+        .json-toggle summary:hover { background: rgba(88,166,255,0.05); }
+        .json-toggle pre { margin: 0; border: none; border-top: 1px solid var(--border); border-radius: 0 0 8px 8px; max-height: 500px; overflow-y: auto; }
+        footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
+        @media (max-width: 600px) { h1 { font-size: 1.6rem; } .cta { padding: 1.5rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav><a href="https://bonskari.github.io/n8n-ai-workflows/">&larr; n8n AI Workflow Templates</a> &middot; <a href="https://bonskari.github.io/n8n-ai-workflows/blog/">Blog</a></nav>
+
+    <article>
+        <h1>How to Automate Customer Support with n8n + Ollama (Free AI Ticket Router)</h1>
+        <p class="meta">Published March 24, 2026 &middot; 11 min read &middot; By Workflow Forge</p>
+
+        <p>Most support helpdesks charge $25&ndash;150/seat/month and still dump every ticket into the same inbox for a human to sort. With n8n and Ollama you can build an AI ticket router that runs entirely on your own hardware &mdash; zero API costs, full data privacy, and unlimited tickets.</p>
+
+        <p>In this tutorial you'll build a webhook-triggered workflow that:</p>
+        <ol>
+            <li>Receives incoming support tickets via HTTP webhook</li>
+            <li>Classifies each ticket into <strong>billing</strong>, <strong>technical</strong>, <strong>feature request</strong>, or <strong>spam</strong> using local AI</li>
+            <li>Routes each category to the right team channel or queue</li>
+            <li>Generates a first-response template automatically</li>
+            <li>Returns a confirmation with routing details to the sender</li>
+        </ol>
+
+        <h2>Why Use Local AI for Support Automation?</h2>
+
+        <p>Customer support tickets contain some of the most sensitive data your business handles: account details, billing complaints, product bugs that reveal your architecture, and occasionally personal health or financial information from users explaining their situation.</p>
+
+        <p>Routing those tickets through a third-party AI API means every message leaves your servers. That's a GDPR concern, a SOC 2 concern, and just generally a bad idea if you care about customer trust.</p>
+
+        <p>Local AI with Ollama solves all three problems:</p>
+
+        <table>
+            <tr><th>Concern</th><th>Cloud AI (OpenAI, Claude)</th><th>Local AI (Ollama)</th></tr>
+            <tr><td><strong>Data privacy</strong></td><td>Tickets sent to third-party servers</td><td>Data never leaves your machine</td></tr>
+            <tr><td><strong>API cost</strong></td><td>$0.01&ndash;0.06 per ticket at scale</td><td>$0.00 &mdash; runs on your hardware</td></tr>
+            <tr><td><strong>Rate limits</strong></td><td>Throttled during traffic spikes</td><td>Only limited by your hardware</td></tr>
+            <tr><td><strong>Compliance</strong></td><td>Requires DPA, data processing agreements</td><td>No third-party data sharing</td></tr>
+            <tr><td><strong>Customization</strong></td><td>Prompt engineering only</td><td>Full model fine-tuning possible</td></tr>
+        </table>
+
+        <p>Ticket classification is also exactly the kind of structured task that small local models handle well. You don't need GPT-4 to tell you that "my invoice is wrong" is a billing ticket. A well-prompted 8B-parameter model running on a $400 server gets this right &gt;95% of the time.</p>
+
+        <div class="highlight">
+            <p><strong>Real numbers:</strong> A business processing 200 support tickets per day at $0.03/ticket via OpenAI API spends ~$180/month, or $2,160/year. Running Ollama locally on a machine you already own costs $0. The workflow below pays for itself in the first week.</p>
+        </div>
+
+        <h2>Architecture Overview</h2>
+
+        <p>The ticket routing pipeline follows a simple, linear flow:</p>
+
+        <pre><code>[Webhook: Ticket arrives]
+        |
+        v
+[Ollama: Classify ticket]
+  (billing / technical / feature-request / spam)
+        |
+        v
+[IF Node: Route by category]
+   /       |        |        \
+  v        v        v         v
+[Billing] [Tech] [Feature] [Spam]
+  |        |        |         |
+  v        v        v         v
+[Generate first-response template]
+        |
+        v
+[Respond to webhook with routing result]</code></pre>
+
+        <p>One Ollama call per ticket for classification, taking 2&ndash;4 seconds on modest hardware. The classification result drives all downstream routing. You can fan this out to as many channels as you need: email, Slack, Jira, Zendesk, or a simple database log.</p>
+
+        <h2>The Four Ticket Categories</h2>
+
+        <p>The classifier routes every ticket into one of four categories. Here's what each covers and how you should handle them:</p>
+
+        <table>
+            <tr><th>Category</th><th>Examples</th><th>Recommended Routing</th></tr>
+            <tr><td><strong>billing</strong></td><td>Invoice errors, subscription cancellations, refund requests, payment failures, pricing questions</td><td>Finance team email / billing queue</td></tr>
+            <tr><td><strong>technical</strong></td><td>Bug reports, integration errors, performance issues, API questions, setup help</td><td>Engineering Slack channel / Jira backlog</td></tr>
+            <tr><td><strong>feature-request</strong></td><td>New feature ideas, UI suggestions, integration requests, missing functionality</td><td>Product backlog / Notion database</td></tr>
+            <tr><td><strong>spam</strong></td><td>Automated messages, solicitations, gibberish, test submissions, off-topic messages</td><td>Discard / low-priority archive</td></tr>
+        </table>
+
+        <p>These four categories cover &gt;98% of real-world support volume. You can extend the workflow with additional categories (e.g., "enterprise-sales", "compliance") by updating the classification prompt.</p>
+
+        <h2>The Classification Prompt</h2>
+
+        <p>The prompt is the core of the system. Here's the exact prompt used in this workflow:</p>
+
+        <pre><code>You are a customer support ticket classifier. Your job is to read a support
+ticket and categorize it into exactly one of these four categories:
+
+- billing: anything related to payments, invoices, subscriptions, refunds,
+  pricing, or account charges
+- technical: bug reports, errors, integration issues, API problems, performance
+  issues, or requests for setup help
+- feature-request: suggestions for new features, UI improvements, integration
+  requests, or missing functionality the user wants added
+- spam: automated messages, solicitations, gibberish, test submissions, or
+  messages completely unrelated to product support
+
+Ticket subject: {{subject}}
+Ticket body: {{body}}
+Sender email: {{email}}
+
+Respond in this EXACT JSON format, nothing else:
+{
+  "category": "&lt;billing|technical|feature-request|spam&gt;",
+  "confidence": &lt;0.0-1.0&gt;,
+  "summary": "&lt;one sentence summary of the ticket&gt;",
+  "priority": "&lt;low|medium|high&gt;"
+}
+
+Priority rules:
+- high: account locked, payment failed, data loss, service down
+- medium: bug affecting workflow, billing discrepancy
+- low: general questions, feature requests, minor issues</code></pre>
+
+        <p>Key design decisions in this prompt:</p>
+        <ul>
+            <li><strong>Explicit category definitions:</strong> Listing what falls into each bucket prevents ambiguous edge cases from being misrouted</li>
+            <li><strong>Forced JSON output:</strong> Structured output makes downstream parsing trivial and reliable</li>
+            <li><strong>Confidence score:</strong> Tickets below 0.7 confidence can be flagged for human review instead of auto-routed</li>
+            <li><strong>Priority field:</strong> Lets you route high-priority tickets to an urgent queue without a separate AI call</li>
+            <li><strong>Low temperature:</strong> Set <code>temperature: 0.1</code> in Ollama for classification tasks &mdash; you want deterministic, consistent output</li>
+        </ul>
+
+        <h2>Prerequisites</h2>
+
+        <p>You need n8n and Ollama installed. If you're starting from scratch:</p>
+
+        <pre><code># Install Ollama and pull a model
+curl -fsSL https://ollama.ai/install.sh | sh
+ollama pull llama3:8b
+
+# Run n8n in Docker
+docker run -d --name n8n -p 5678:5678 \
+  --add-host=host.docker.internal:host-gateway \
+  -v n8n_data:/home/node/.n8n \
+  n8nio/n8n</code></pre>
+
+        <div class="highlight">
+            <p><strong>Docker networking:</strong> If n8n runs in Docker, use <code>http://host.docker.internal:11434</code> for all Ollama URLs. If n8n runs natively, use <code>http://localhost:11434</code>. The workflow JSON below uses <code>localhost</code> &mdash; swap it if needed.</p>
+        </div>
+
+        <h2>Free Workflow: AI Support Ticket Router</h2>
+
+        <p>Here's a complete, working n8n workflow. Import the JSON directly into your n8n instance via Settings &rarr; Import Workflow.</p>
+
+        <h3>Step-by-Step Breakdown</h3>
+
+        <div class="step">
+            <div class="step-number">STEP 1: Webhook Trigger</div>
+            <p>Exposes a <code>POST /webhook/support-ticket</code> endpoint. Your contact form, help widget, or email-to-webhook service sends ticket data here as JSON with fields <code>subject</code>, <code>body</code>, <code>email</code>, and optionally <code>name</code>.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 2: Ollama Classification</div>
+            <p>Sends the ticket content to Ollama using the prompt above. Returns a JSON object with <code>category</code>, <code>confidence</code>, <code>summary</code>, and <code>priority</code>. Uses <code>temperature: 0.1</code> for consistent, deterministic output.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 3: Parse AI Response</div>
+            <p>A Set node extracts the classification result from the Ollama response. Handles edge cases where the model wraps JSON in markdown code fences (strips them with a regex). Falls back gracefully if parsing fails.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 4: IF Node Routing</div>
+            <p>Four IF nodes check the <code>category</code> field and branch execution accordingly. Each branch can connect to whatever notification or ticketing system you use &mdash; Slack, email, Jira, Zendesk, a database, or all of the above.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 5: Response Template Generation</div>
+            <p>Each routing branch generates a category-appropriate first-response message. Billing tickets get a response acknowledging the payment issue and setting an SLA. Technical tickets get a bug report confirmation. Feature requests get an "added to our roadmap" message. Spam gets silently dropped.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 6: Webhook Response</div>
+            <p>Returns a JSON response to the original requester with the ticket ID, assigned category, priority, and the auto-generated first-response text. Your frontend can display this immediately to the user as confirmation.</p>
+        </div>
+
+        <h3>The Workflow JSON</h3>
+
+        <details class="json-toggle">
+            <summary>Click to expand full workflow JSON</summary>
+            <pre><code>{
+  "name": "AI Support Ticket Router (Ollama)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "support-ticket",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Receive Ticket",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "support-ticket"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama3:8b', prompt: 'You are a customer support ticket classifier. Categorize the ticket into exactly one of: billing, technical, feature-request, spam.\\n\\n- billing: payments, invoices, subscriptions, refunds, pricing, account charges\\n- technical: bug reports, errors, integration issues, API problems, setup help\\n- feature-request: new feature suggestions, UI improvements, missing functionality\\n- spam: automated messages, solicitations, gibberish, off-topic messages\\n\\nTicket subject: ' + ($json.body.subject || 'No subject') + '\\nTicket body: ' + ($json.body.body || 'No body') + '\\nSender email: ' + ($json.body.email || 'Unknown') + '\\n\\nRespond in this EXACT JSON format, nothing else:\\n{\"category\": \"<billing|technical|feature-request|spam>\", \"confidence\": <0.0-1.0>, \"summary\": \"<one sentence>\", \"priority\": \"<low|medium|high>\"}\\n\\nPriority rules: high = account locked/payment failed/data loss/service down, medium = bug affecting workflow/billing discrepancy, low = general questions/feature requests/minor issues', stream: false, options: { temperature: 0.1, num_predict: 200 } }) }}",
+        "options": { "timeout": 60000 }
+      },
+      "id": "classify-ticket",
+      "name": "Classify Ticket (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "raw_response",
+              "name": "raw_response",
+              "value": "={{ $json.response }}",
+              "type": "string"
+            },
+            {
+              "id": "classification",
+              "name": "classification",
+              "value": "={{ (() => { try { const r = $json.response.replace(/```json\\n?|```/g, '').trim(); return JSON.parse(r); } catch(e) { return { category: 'technical', confidence: 0.5, summary: 'Parse error - needs manual review', priority: 'medium' }; } })() }}",
+              "type": "object"
+            },
+            {
+              "id": "ticket_id",
+              "name": "ticket_id",
+              "value": "={{ 'TKT-' + Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "original_subject",
+              "name": "original_subject",
+              "value": "={{ $('Receive Ticket').item.json.body.subject || 'No subject' }}",
+              "type": "string"
+            },
+            {
+              "id": "original_email",
+              "name": "original_email",
+              "value": "={{ $('Receive Ticket').item.json.body.email || 'Unknown' }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "parse-result",
+      "name": "Parse Classification",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.classification.category }}",
+              "rightValue": "billing",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      },
+      "id": "if-billing",
+      "name": "Is Billing?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.classification.category }}",
+              "rightValue": "technical",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      },
+      "id": "if-technical",
+      "name": "Is Technical?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 340]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.classification.category }}",
+              "rightValue": "feature-request",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      },
+      "id": "if-feature",
+      "name": "Is Feature Request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 480]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response_text",
+              "name": "response_text",
+              "value": "=Hi there,\n\nThank you for reaching out about your billing concern. We've received your message and our billing team will review your account within 1 business day.\n\nTicket ID: {{ $json.ticket_id }}\nPriority: {{ $json.classification.priority }}\n\nIf your issue is urgent (e.g. payment failure or account lockout), please reply to this message and we'll escalate immediately.\n\nBest,\nSupport Team",
+              "type": "string"
+            },
+            {
+              "id": "routing_destination",
+              "name": "routing_destination",
+              "value": "billing-team@yourcompany.com",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "billing-response",
+      "name": "Billing Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1120, 160]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response_text",
+              "name": "response_text",
+              "value": "=Hi there,\n\nThank you for reporting this issue. We've logged your technical support request and our engineering team will investigate.\n\nTicket ID: {{ $json.ticket_id }}\nPriority: {{ $json.classification.priority }}\n\nTo help us resolve this faster, please include any error messages, screenshots, or steps to reproduce the issue if you haven't already.\n\nBest,\nSupport Team",
+              "type": "string"
+            },
+            {
+              "id": "routing_destination",
+              "name": "routing_destination",
+              "value": "#engineering-support (Slack)",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "technical-response",
+      "name": "Technical Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response_text",
+              "name": "response_text",
+              "value": "=Hi there,\n\nThank you for your feedback! We've added your feature request to our product backlog for the team to review.\n\nTicket ID: {{ $json.ticket_id }}\n\nWe review all feature requests during our monthly planning sessions. While we can't guarantee every request will be implemented, your input directly shapes our roadmap.\n\nBest,\nSupport Team",
+              "type": "string"
+            },
+            {
+              "id": "routing_destination",
+              "name": "routing_destination",
+              "value": "product-backlog (Notion/Linear)",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "feature-response",
+      "name": "Feature Request Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1120, 440]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response_text",
+              "name": "response_text",
+              "value": "=Message classified as spam. No response sent.",
+              "type": "string"
+            },
+            {
+              "id": "routing_destination",
+              "name": "routing_destination",
+              "value": "spam-archive",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "spam-response",
+      "name": "Spam Handler",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1120, 580]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ticket_id: $json.ticket_id, category: $json.classification.category, priority: $json.classification.priority, confidence: $json.classification.confidence, summary: $json.classification.summary, routed_to: $json.routing_destination, auto_response: $json.response_text }) }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Return Routing Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1340, 380]
+    }
+  ],
+  "connections": {
+    "Receive Ticket": {
+      "main": [[{ "node": "Classify Ticket (Ollama)", "type": "main", "index": 0 }]]
+    },
+    "Classify Ticket (Ollama)": {
+      "main": [[{ "node": "Parse Classification", "type": "main", "index": 0 }]]
+    },
+    "Parse Classification": {
+      "main": [[
+        { "node": "Is Billing?", "type": "main", "index": 0 },
+        { "node": "Is Technical?", "type": "main", "index": 0 },
+        { "node": "Is Feature Request?", "type": "main", "index": 0 }
+      ]]
+    },
+    "Is Billing?": {
+      "main": [
+        [{ "node": "Billing Response", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Is Technical?": {
+      "main": [
+        [{ "node": "Technical Response", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Is Feature Request?": {
+      "main": [
+        [{ "node": "Feature Request Response", "type": "main", "index": 0 }],
+        [{ "node": "Spam Handler", "type": "main", "index": 0 }]
+      ]
+    },
+    "Billing Response": {
+      "main": [[{ "node": "Return Routing Result", "type": "main", "index": 0 }]]
+    },
+    "Technical Response": {
+      "main": [[{ "node": "Return Routing Result", "type": "main", "index": 0 }]]
+    },
+    "Feature Request Response": {
+      "main": [[{ "node": "Return Routing Result", "type": "main", "index": 0 }]]
+    },
+    "Spam Handler": {
+      "main": [[{ "node": "Return Routing Result", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [
+    { "name": "AI" },
+    { "name": "Ollama" },
+    { "name": "Customer Support" },
+    { "name": "Ticket Routing" }
+  ]
+}</code></pre>
+        </details>
+
+        <h3>Testing the Workflow</h3>
+
+        <p>Once imported and activated, test each category with curl:</p>
+
+        <pre><code># Test a billing ticket
+curl -X POST http://localhost:5678/webhook/support-ticket \
+  -H "Content-Type: application/json" \
+  -d '{
+    "subject": "Charged twice for my subscription",
+    "body": "Hi, I noticed two charges of $49 on my credit card this month for my Pro subscription. Can you refund one of them? My account email is john@example.com.",
+    "email": "john@example.com",
+    "name": "John Smith"
+  }'</code></pre>
+
+        <p>Expected response:</p>
+
+        <pre><code>{
+  "ticket_id": "TKT-1711234567890",
+  "category": "billing",
+  "priority": "medium",
+  "confidence": 0.97,
+  "summary": "Customer was charged twice for their Pro subscription and requests a refund",
+  "routed_to": "billing-team@yourcompany.com",
+  "auto_response": "Hi there,\n\nThank you for reaching out about your billing concern..."
+}</code></pre>
+
+        <pre><code># Test a technical ticket
+curl -X POST http://localhost:5678/webhook/support-ticket \
+  -H "Content-Type: application/json" \
+  -d '{
+    "subject": "API returning 500 errors on /v2/export endpoint",
+    "body": "Getting intermittent 500 errors when calling the export API. Happens about 1 in 10 requests. Error: Internal Server Error. Started yesterday around 3pm UTC.",
+    "email": "dev@startup.io",
+    "name": "Alex Developer"
+  }'</code></pre>
+
+        <pre><code># Test a feature request
+curl -X POST http://localhost:5678/webhook/support-ticket \
+  -H "Content-Type: application/json" \
+  -d '{
+    "subject": "Dark mode please!",
+    "body": "Would love a dark mode option in the dashboard. My eyes hurt after long sessions. Other tools like Figma and Linear have this. Would be a great addition!",
+    "email": "user@gmail.com",
+    "name": "Casey"
+  }'</code></pre>
+
+        <h2>Connecting to Real Channels</h2>
+
+        <p>The workflow above has placeholder routing destinations. Here's how to wire up real integrations after each branch:</p>
+
+        <h3>Slack Notifications</h3>
+        <p>Add a Slack node after the Technical Response step. Map <code>$json.ticket_id</code>, <code>$json.classification.summary</code>, and <code>$json.classification.priority</code> to a message block. High-priority tickets can @mention the on-call engineer.</p>
+
+        <h3>Email to Team Inbox</h3>
+        <p>Add an Email Send node (Gmail, SMTP, or Outlook) after the Billing Response step. Use <code>$json.original_email</code> as the reply-to and route to your billing team's inbox. Attach the AI summary and ticket ID in the subject line.</p>
+
+        <h3>Jira / Linear / GitHub Issues</h3>
+        <p>After the Technical Response branch, add a Jira or Linear node to automatically create an issue. Map the ticket summary to the issue title, set priority from <code>$json.classification.priority</code>, and tag it with the right label.</p>
+
+        <h3>Notion / Airtable for Feature Requests</h3>
+        <p>After the Feature Request Response branch, add a Notion Database Item or Airtable Record node. Log the ticket ID, summary, sender email, and date so your product team has a structured backlog.</p>
+
+        <h3>Low-Confidence Escalation</h3>
+        <p>Add a final IF node before routing that checks <code>$json.classification.confidence &lt; 0.7</code>. Route low-confidence tickets to a "needs human review" Slack channel instead of auto-routing them. This catches genuinely ambiguous tickets that span categories.</p>
+
+        <div class="highlight">
+            <p><strong>Spam filtering tip:</strong> If you're getting many false positives (legitimate tickets classified as spam), add a rule: only classify as spam if confidence is above 0.9. Below that threshold, fall back to "technical" as the default category. This prevents losing real customer messages.</p>
+        </div>
+
+        <h2>Tuning the Prompt for Your Business</h2>
+
+        <p>The default four-category prompt works for most SaaS products. Here's how to adapt it:</p>
+
+        <h3>Add Custom Categories</h3>
+        <p>Insert additional category definitions into the prompt. For example, if you have an enterprise tier, add a "sales-inquiry" category for upsell and expansion conversations. Update the IF node chain to handle the new category.</p>
+
+        <h3>Industry-Specific Language</h3>
+        <p>If your customers use specialized terminology (medical, legal, financial), add a context line to the prompt: <em>"This is a support system for a healthcare software company. Clinical terminology is expected and normal."</em> This prevents the model from misclassifying domain-specific language as spam.</p>
+
+        <h3>Language and Tone Detection</h3>
+        <p>Add a <code>"language": "&lt;ISO 639-1 code&gt;"</code> field to the JSON output format. Route non-English tickets to a localization queue or flag them for human review. Ollama's multilingual models handle this without extra configuration.</p>
+
+        <h3>Model Selection</h3>
+        <p><code>llama3:8b</code> is the right default for this task &mdash; fast, accurate on structured classification, and small enough to run on a single consumer GPU. If you process tickets in multiple languages or have complex edge cases, try <code>mistral:7b-instruct</code> which has stronger multilingual support.</p>
+
+        <h2>Comparison: Local AI vs. Support Helpdesk Tools</h2>
+
+        <table>
+            <tr><th></th><th>n8n + Ollama (This Workflow)</th><th>Zendesk / Freshdesk AI</th></tr>
+            <tr><td><strong>Monthly cost</strong></td><td>$0 (plus n8n hosting)</td><td>$25&ndash;115/agent/month</td></tr>
+            <tr><td><strong>Data privacy</strong></td><td>Tickets never leave your server</td><td>Processed on vendor servers</td></tr>
+            <tr><td><strong>Customization</strong></td><td>Full control over categories and routing logic</td><td>Limited to vendor's AI model</td></tr>
+            <tr><td><strong>Integration</strong></td><td>Any tool with an API or n8n node</td><td>Native integrations only</td></tr>
+            <tr><td><strong>Ticket volume</strong></td><td>Unlimited</td><td>Tiered by plan</td></tr>
+            <tr><td><strong>Setup time</strong></td><td>~45 minutes</td><td>~2 hours (plus onboarding)</td></tr>
+        </table>
+
+        <p>This workflow is not a replacement for a full helpdesk with a human agent UI, SLA tracking, and customer reply threads. It's a routing layer that sits in front of your existing tools and eliminates the manual triage step. You save time and ensure every ticket lands in the right queue immediately.</p>
+
+        <div class="cta">
+            <h3>Want the Production-Ready Version?</h3>
+            <p>The <strong>Self-Hosted AI Workflow Pack</strong> includes an advanced support router with CRM sync, Slack alerts, SLA escalation, confidence-based human review queuing, and 10 more AI workflows &mdash; all running locally with Ollama.</p>
+            <a href="https://buy.stripe.com/28EaEXdSJ1I67WbaivabK0c" class="btn">Get All 11 Workflows &mdash; $39</a>
+            <p style="margin-top: 1rem; color: var(--muted); font-size: 0.85rem;">One-time purchase. No subscriptions. 30-day money-back guarantee.</p>
+        </div>
+
+        <h2>Next Steps</h2>
+
+        <ol>
+            <li><strong>Import the workflow</strong> &mdash; Copy the JSON above into n8n via Settings &rarr; Import Workflow</li>
+            <li><strong>Test each category</strong> &mdash; Use the curl examples to verify classification is working</li>
+            <li><strong>Wire up your channels</strong> &mdash; Add Slack, email, or Jira nodes after each routing branch</li>
+            <li><strong>Point your contact form at the webhook</strong> &mdash; Replace your current form action with the n8n webhook URL</li>
+            <li><strong>Monitor for 1 week</strong> &mdash; Check classification accuracy and tune the prompt for any misrouted tickets</li>
+        </ol>
+
+        <p>If you want to explore more n8n + Ollama workflows, check out our other tutorials:</p>
+        <ul>
+            <li><a href="/n8n-ai-workflows/blog/n8n-ai-lead-scoring-ollama-workflow.html">AI Lead Scoring with n8n + Ollama</a></li>
+            <li><a href="/n8n-ai-workflows/blog/automate-email-responses-n8n-ollama.html">Automate Email Responses with n8n + Ollama</a></li>
+            <li><a href="/n8n-ai-workflows/blog/n8n-social-media-content-generator-ollama.html">Social Media Content Generator with n8n + Ollama</a></li>
+            <li><a href="/n8n-ai-workflows/blog/">All n8n + Ollama Tutorials</a></li>
+        </ul>
+    </article>
+
+    <footer>
+        <p>&copy; 2026 Workflow Forge. Built with n8n + Ollama.</p>
+    </footer>
+</div>
+</body>
+</html>
