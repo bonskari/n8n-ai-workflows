@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automate Content Moderation with n8n + Ollama (AI Comment Filter)</title>
+    <meta name="description" content="Build an automated content moderation pipeline with n8n and Ollama. Filter toxic comments, spam, and inappropriate content using local AI. No API costs, full privacy. Free workflow template.">
+    <meta property="og:title" content="AI Content Moderation with n8n + Ollama — Free Workflow Template">
+    <meta property="og:description" content="Automate comment and content moderation using local AI. Free n8n workflow that filters toxic, spam, and inappropriate content on your own hardware.">
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-content-moderation-ollama.html">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Automate Content Moderation with n8n + Ollama (AI Comment Filter)",
+        "description": "Build an automated content moderation pipeline with n8n and Ollama. Classify user-generated content as safe, toxic, spam, or inappropriate using local AI. Free workflow template included.",
+        "author": {"@type": "Organization", "name": "Workflow Forge"},
+        "datePublished": "2026-03-24",
+        "publisher": {"@type": "Organization", "name": "Workflow Forge"}
+    }
+    </script>
+    <style>
+        :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --orange: #d29922; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+        .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav { padding: 1rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; line-height: 1.3; }
+        h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; color: var(--accent); }
+        h3 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; }
+        .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1rem 0 1.5rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; }
+        code { font-family: 'SF Mono', 'Fira Code', monospace; }
+        p code, li code { background: var(--surface); border: 1px solid var(--border); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.88em; }
+        ul, ol { margin: 0 0 1rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .cta { background: linear-gradient(135deg, #1a3a5c, #1a2d4a); border: 1px solid var(--accent); border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center; }
+        .cta h3 { color: var(--accent); margin-top: 0; }
+        .cta a.btn { display: inline-block; background: var(--accent); color: #000; padding: 0.75rem 2rem; border-radius: 8px; font-weight: bold; text-decoration: none; margin-top: 1rem; }
+        .cta a.btn:hover { opacity: 0.9; text-decoration: none; }
+        .highlight { background: var(--surface); border-left: 3px solid var(--accent); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
+        th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; }
+        th { background: var(--surface); }
+        .step { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+        .step-number { color: var(--accent); font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .json-toggle { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin: 1.5rem 0; }
+        .json-toggle summary { cursor: pointer; padding: 1rem 1.25rem; font-weight: 600; color: var(--accent); }
+        .json-toggle summary:hover { background: rgba(88,166,255,0.05); }
+        .json-toggle pre { margin: 0; border: none; border-top: 1px solid var(--border); border-radius: 0 0 8px 8px; max-height: 500px; overflow-y: auto; }
+        footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
+        @media (max-width: 600px) { h1 { font-size: 1.6rem; } .cta { padding: 1.5rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav><a href="https://bonskari.github.io/n8n-ai-workflows/">&larr; n8n AI Workflow Templates</a> &middot; <a href="https://bonskari.github.io/n8n-ai-workflows/blog/">Blog</a></nav>
+
+    <article>
+        <h1>Automate Content Moderation with n8n + Ollama (AI Comment Filter)</h1>
+        <p class="meta">Published March 24, 2026 &middot; 12 min read &middot; By Workflow Forge</p>
+
+        <p>Content moderation is one of the most expensive and mentally draining tasks for any online community or platform. Cloud moderation APIs charge $1&ndash;3 per 1,000 requests and send every piece of user content to a third party. With n8n and Ollama, you can build a fully automated moderation pipeline that runs on your own hardware &mdash; zero per-request costs, unlimited volume, and complete data privacy.</p>
+
+        <p>In this tutorial you'll build a workflow that:</p>
+        <ol>
+            <li>Receives user-generated content (comments, posts, reviews) via webhook</li>
+            <li>Classifies each piece of content into <strong>safe</strong>, <strong>toxic</strong>, <strong>spam</strong>, <strong>inappropriate</strong>, or <strong>needs review</strong></li>
+            <li>Auto-approves safe content and auto-rejects obvious spam/toxic content</li>
+            <li>Routes borderline content to a human review queue</li>
+            <li>Logs every moderation decision for audit compliance</li>
+        </ol>
+
+        <h2>Why Local AI for Content Moderation?</h2>
+
+        <table>
+            <tr><th>Feature</th><th>Cloud APIs (Perspective, OpenAI)</th><th>Self-Hosted (n8n + Ollama)</th></tr>
+            <tr><td>Cost per 1K requests</td><td>$1&ndash;3</td><td>$0 (your hardware)</td></tr>
+            <tr><td>Data privacy</td><td>Content sent to third party</td><td>Never leaves your server</td></tr>
+            <tr><td>Custom rules</td><td>Limited to provider's categories</td><td>Fully customizable prompt</td></tr>
+            <tr><td>Latency</td><td>200&ndash;500ms (network + inference)</td><td>100&ndash;300ms (local inference only)</td></tr>
+            <tr><td>Rate limits</td><td>Yes (often 1&ndash;10 QPS)</td><td>No limits beyond your hardware</td></tr>
+            <tr><td>GDPR compliance</td><td>Requires DPA with provider</td><td>Inherent &mdash; data stays local</td></tr>
+        </table>
+
+        <div class="highlight">
+            <strong>Key advantage:</strong> For communities handling sensitive content (healthcare forums, children's platforms, internal corporate tools), keeping moderation fully local eliminates a major compliance headache. You never have to worry about a third party processing user data.
+        </div>
+
+        <h2>Prerequisites</h2>
+        <ul>
+            <li><strong>n8n</strong> &mdash; self-hosted instance (Docker or npm install)</li>
+            <li><strong>Ollama</strong> &mdash; running locally with a model pulled (we'll use <code>mistral:7b</code> for speed or <code>qwen2.5:14b</code> for accuracy)</li>
+            <li><strong>~4GB RAM</strong> for the 7B model, ~8GB for the 14B model</li>
+        </ul>
+
+        <h2>Architecture Overview</h2>
+
+        <pre><code>User Content (webhook)
+    &darr;
+[Preprocessing] &mdash; Strip HTML, normalize text, extract metadata
+    &darr;
+[Ollama Classification] &mdash; Classify: safe / toxic / spam / inappropriate / needs_review
+    &darr;
+[Decision Router] &mdash; Switch node based on classification
+    &darr;                   &darr;                    &darr;
+[Auto-Approve]     [Auto-Reject]        [Human Review Queue]
+    &darr;                   &darr;                    &darr;
+[Callback API]     [Notify User]        [Slack/Email Alert]
+    &darr;                   &darr;                    &darr;
+[Audit Log]        [Audit Log]          [Audit Log]</code></pre>
+
+        <h2>Step-by-Step Build</h2>
+
+        <div class="step">
+            <div class="step-number">STEP 1 &mdash; Webhook Trigger</div>
+            <h3>Receive content to moderate</h3>
+            <p>Add a <strong>Webhook</strong> node as the trigger. Your application sends a POST request whenever new content is submitted:</p>
+            <pre><code>POST /webhook/moderate
+Content-Type: application/json
+
+{
+  "content_id": "comment_12345",
+  "text": "This is the user's comment text",
+  "author_id": "user_789",
+  "content_type": "comment",
+  "context": "product-review"
+}</code></pre>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 2 &mdash; Preprocessing</div>
+            <h3>Clean and normalize input</h3>
+            <p>Add a <strong>Code</strong> node to strip HTML tags, normalize whitespace, and extract metadata that helps with classification:</p>
+            <pre><code>// Strip HTML and normalize
+const text = $input.item.json.text
+  .replace(/&lt;[^&gt;]*&gt;/g, '')
+  .replace(/\s+/g, ' ')
+  .trim();
+
+// Extract basic signals
+const hasUrls = /https?:\/\/\S+/i.test(text);
+const hasExcessiveCaps = (text.replace(/[^A-Z]/g, '').length / text.length) > 0.5;
+const wordCount = text.split(/\s+/).length;
+
+return {
+  json: {
+    ...$input.item.json,
+    cleaned_text: text,
+    signals: { hasUrls, hasExcessiveCaps, wordCount }
+  }
+};</code></pre>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 3 &mdash; Ollama Classification</div>
+            <h3>Classify content with local AI</h3>
+            <p>Add an <strong>HTTP Request</strong> node to call your local Ollama instance. The prompt is the most critical part &mdash; it defines your moderation policy:</p>
+            <pre><code>POST http://localhost:11434/api/generate
+
+{
+  "model": "mistral:7b",
+  "prompt": "You are a content moderator. Classify the following user-generated content into exactly one category.\n\nCategories:\n- SAFE: Normal, constructive content. Opinions, questions, feedback are fine.\n- TOXIC: Hate speech, threats, severe insults, harassment, discrimination.\n- SPAM: Promotional content, repeated text, SEO spam, phishing links.\n- INAPPROPRIATE: Sexual content, graphic violence, personal information exposure.\n- NEEDS_REVIEW: Borderline content that could go either way. Sarcasm, dark humor, heated but not hateful debate.\n\nContent to classify:\n\"{{cleaned_text}}\"\n\nAdditional signals:\n- Contains URLs: {{signals.hasUrls}}\n- Excessive capitals: {{signals.hasExcessiveCaps}}\n- Word count: {{signals.wordCount}}\n\nRespond with ONLY a JSON object:\n{\"category\": \"SAFE|TOXIC|SPAM|INAPPROPRIATE|NEEDS_REVIEW\", \"confidence\": 0.0-1.0, \"reason\": \"brief explanation\"}",
+  "stream": false,
+  "options": {
+    "temperature": 0.1,
+    "num_predict": 100
+  }
+}</code></pre>
+            <p>Setting <code>temperature: 0.1</code> keeps the output deterministic. The <code>num_predict: 100</code> limit prevents the model from rambling &mdash; moderation decisions should be short.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 4 &mdash; Parse Response</div>
+            <h3>Extract the classification</h3>
+            <p>Add a <strong>Code</strong> node to parse Ollama's JSON response with error handling:</p>
+            <pre><code>const response = $input.item.json.response;
+
+// Extract JSON from response (model sometimes wraps in markdown)
+const jsonMatch = response.match(/\{[\s\S]*?\}/);
+let classification;
+
+try {
+  classification = JSON.parse(jsonMatch[0]);
+} catch (e) {
+  // Fallback: if JSON parsing fails, send to human review
+  classification = {
+    category: "NEEDS_REVIEW",
+    confidence: 0,
+    reason: "Failed to parse AI response"
+  };
+}
+
+// Normalize category
+const validCategories = ["SAFE", "TOXIC", "SPAM", "INAPPROPRIATE", "NEEDS_REVIEW"];
+if (!validCategories.includes(classification.category)) {
+  classification.category = "NEEDS_REVIEW";
+}
+
+return {
+  json: {
+    ...$input.first().json,
+    moderation: classification
+  }
+};</code></pre>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 5 &mdash; Decision Router</div>
+            <h3>Route based on classification</h3>
+            <p>Add a <strong>Switch</strong> node that routes content based on the category:</p>
+            <ul>
+                <li><strong>SAFE</strong> &rarr; Auto-approve (callback to your API)</li>
+                <li><strong>TOXIC / SPAM</strong> &rarr; Auto-reject (callback + notify user)</li>
+                <li><strong>INAPPROPRIATE</strong> &rarr; Auto-reject with specific reason</li>
+                <li><strong>NEEDS_REVIEW</strong> &rarr; Human review queue (Slack/email alert)</li>
+            </ul>
+            <p>Switch condition: <code>{{ $json.moderation.category }}</code></p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 6 &mdash; Callbacks &amp; Notifications</div>
+            <h3>Act on the decision</h3>
+            <p>For auto-approve, send a callback to your application:</p>
+            <pre><code>POST https://your-app.com/api/moderation/callback
+
+{
+  "content_id": "{{content_id}}",
+  "action": "approve",
+  "category": "{{moderation.category}}",
+  "confidence": {{moderation.confidence}}
+}</code></pre>
+            <p>For human review, send a Slack message with the content and one-click approve/reject buttons:</p>
+            <pre><code>{
+  "text": "Content needs review",
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Content ID:* {{content_id}}\n*Author:* {{author_id}}\n*AI Classification:* {{moderation.category}} ({{moderation.confidence}})\n*Reason:* {{moderation.reason}}\n\n> {{cleaned_text}}"
+      }
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <div class="step">
+            <div class="step-number">STEP 7 &mdash; Audit Log</div>
+            <h3>Log every decision for compliance</h3>
+            <p>Every moderation action must be logged. Add a final <strong>Spreadsheet/Database</strong> node that records:</p>
+            <pre><code>{
+  "timestamp": "{{$now.toISO()}}",
+  "content_id": "{{content_id}}",
+  "author_id": "{{author_id}}",
+  "category": "{{moderation.category}}",
+  "confidence": {{moderation.confidence}},
+  "reason": "{{moderation.reason}}",
+  "action_taken": "approve|reject|review",
+  "reviewed_by": "ai"
+}</code></pre>
+            <p>This audit trail is essential for GDPR compliance (users can request why their content was rejected) and for improving your moderation rules over time.</p>
+        </div>
+
+        <h2>Tuning Your Moderation Policy</h2>
+
+        <h3>Confidence thresholds</h3>
+        <p>Don't trust the AI blindly. Add confidence-based routing:</p>
+        <ul>
+            <li><strong>High confidence (&gt;0.85)</strong> &mdash; Auto-action (approve or reject)</li>
+            <li><strong>Medium confidence (0.5&ndash;0.85)</strong> &mdash; Send to human review regardless of category</li>
+            <li><strong>Low confidence (&lt;0.5)</strong> &mdash; Always send to human review</li>
+        </ul>
+
+        <h3>Custom rules per context</h3>
+        <p>Different content types need different policies. A product review has different standards than a children's forum. Adjust the prompt per <code>context</code> field:</p>
+        <pre><code>// In the preprocessing Code node:
+const prompts = {
+  "product-review": "Allow negative opinions but flag personal attacks...",
+  "kids-forum": "Strict moderation. Flag anything remotely inappropriate...",
+  "internal-chat": "Relaxed moderation. Only flag clearly toxic content..."
+};
+
+const moderationPrompt = prompts[$input.item.json.context] || prompts["product-review"];</code></pre>
+
+        <h3>Model selection</h3>
+        <table>
+            <tr><th>Model</th><th>Speed</th><th>Accuracy</th><th>Best for</th></tr>
+            <tr><td><code>mistral:7b</code></td><td>Fast (~200ms)</td><td>Good</td><td>High-volume, clear-cut content</td></tr>
+            <tr><td><code>qwen2.5:14b</code></td><td>Medium (~500ms)</td><td>Very good</td><td>Nuanced content, sarcasm detection</td></tr>
+            <tr><td><code>llama3.1:8b</code></td><td>Fast (~250ms)</td><td>Good</td><td>General purpose, good multilingual</td></tr>
+            <tr><td><code>qwen2.5:32b</code></td><td>Slow (~1.5s)</td><td>Excellent</td><td>Second-pass review of borderline content</td></tr>
+        </table>
+
+        <div class="highlight">
+            <strong>Pro tip:</strong> Use a two-pass system for production. The first pass uses a fast 7B model for initial classification. Only content classified as NEEDS_REVIEW gets a second pass with the more accurate 14B or 32B model. This gives you the speed of the small model for 80%+ of content while maintaining accuracy on the edge cases.
+        </div>
+
+        <h2>Scaling to Production</h2>
+
+        <h3>Batch processing</h3>
+        <p>For platforms with high volume, modify the webhook to accept arrays of content items and process them in parallel using n8n's <strong>Split In Batches</strong> node. A single 7B model on a modern GPU can handle 10&ndash;20 classifications per second.</p>
+
+        <h3>Feedback loop</h3>
+        <p>When human reviewers override AI decisions, log the correction. Periodically review these overrides to improve your prompts:</p>
+        <ul>
+            <li>If the AI flags too many safe comments as toxic &rarr; adjust the TOXIC definition in your prompt</li>
+            <li>If spam is getting through &rarr; add more spam indicators to the signals</li>
+            <li>If a specific topic keeps getting flagged incorrectly &rarr; add it as an exception in the prompt</li>
+        </ul>
+
+        <h3>Multi-language support</h3>
+        <p>Ollama models like <code>qwen2.5</code> and <code>llama3.1</code> support 20+ languages natively. Add a language detection step before classification, and use language-specific prompt variants for better accuracy.</p>
+
+        <h2>Common Use Cases</h2>
+
+        <ul>
+            <li><strong>Forum/community moderation</strong> &mdash; Auto-moderate user posts and comments</li>
+            <li><strong>Product review filtering</strong> &mdash; Filter fake reviews, spam, and inappropriate content</li>
+            <li><strong>Support ticket triage</strong> &mdash; Flag abusive customer messages for manager review</li>
+            <li><strong>Internal tool protection</strong> &mdash; Moderate AI chatbot outputs before they reach users</li>
+            <li><strong>Social media management</strong> &mdash; Pre-screen comments on your brand's social accounts</li>
+            <li><strong>E-commerce listing moderation</strong> &mdash; Verify product descriptions meet platform guidelines</li>
+        </ul>
+
+        <div class="cta">
+            <h3>Want the complete workflow + 10 more AI templates?</h3>
+            <p>Get the full Self-Hosted AI Workflow Pack for n8n + Ollama. 11 production-ready templates including content moderation, email automation, lead scoring, and more.</p>
+            <a href="https://buy.stripe.com/28EaEXdSJ1I67WbaivabK0c" class="btn">Get the Pack &mdash; $39</a>
+        </div>
+
+        <h2>Summary</h2>
+
+        <p>Content moderation is a perfect use case for local AI: it's high-volume, privacy-sensitive, and the classification task is well-suited for smaller language models. By running it on your own hardware with n8n + Ollama, you eliminate per-request costs, keep user data private, and get full control over your moderation policy.</p>
+
+        <p>The two-pass architecture (fast model for initial screening + accurate model for edge cases) gives you the best of both worlds: speed for the 80% of content that's clearly safe or clearly bad, and accuracy for the 20% that needs careful judgment.</p>
+
+        <p>Start with the basic pipeline, then iterate on your prompts based on real moderation data. The audit log is your best friend &mdash; it shows you exactly where the AI gets it wrong so you can fix it.</p>
+
+    </article>
+
+    <footer>
+        <p>&copy; 2026 <a href="https://bonskari.github.io/n8n-ai-workflows/">Workflow Forge</a>. All rights reserved.</p>
+        <p><a href="https://bonskari.github.io/n8n-ai-workflows/">Home</a> &middot; <a href="https://bonskari.github.io/n8n-ai-workflows/blog/">Blog</a></p>
+    </footer>
+</div>
+</body>
+</html>
