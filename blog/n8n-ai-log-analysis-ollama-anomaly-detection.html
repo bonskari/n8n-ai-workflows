@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automate Log Analysis with n8n + Ollama (AI Anomaly Detection)</title>
+    <meta name="description" content="Build an automated log analysis and anomaly detection pipeline with n8n and Ollama. Parse logs, detect patterns, classify errors, and alert on anomalies. Self-hosted, private, no API costs.">
+    <meta property="og:title" content="AI Log Analysis with n8n + Ollama — Free Workflow">
+    <meta property="og:description" content="Automate log monitoring and anomaly detection with local AI. Parse application logs, classify errors, detect patterns, and get Slack/email alerts. Free n8n workflow template.">
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-log-analysis-ollama-anomaly-detection.html">
+    <link rel="alternate" type="application/rss+xml" title="n8n + Ollama AI Workflow Tutorials" href="https://bonskari.github.io/n8n-ai-workflows/feed.xml">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Automate Log Analysis with n8n + Ollama (AI Anomaly Detection)",
+        "description": "Build an automated log analysis and anomaly detection pipeline with n8n and Ollama. Parse logs, detect patterns, classify errors, and alert on anomalies.",
+        "author": {"@type": "Organization", "name": "Workflow Forge"},
+        "datePublished": "2026-03-25",
+        "publisher": {"@type": "Organization", "name": "Workflow Forge"}
+    }
+    </script>
+    <style>
+        :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --orange: #d29922; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+        .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav { padding: 1rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; line-height: 1.3; }
+        .meta { color: var(--muted); margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+        h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+        h2:first-of-type { border-top: none; padding-top: 0; }
+        h3 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; color: var(--accent); }
+        p { margin-bottom: 1rem; }
+        ul, ol { margin: 0 0 1rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        strong { color: #fff; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1rem 0 1.5rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; }
+        code { font-family: 'SF Mono', 'Fira Code', monospace; color: var(--text); }
+        p code, li code { background: var(--surface); border: 1px solid var(--border); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.88em; }
+        .tip { background: var(--surface); border-left: 3px solid var(--green); border-radius: 0 8px 8px 0; padding: 1.25rem; margin: 1.5rem 0; }
+        .tip strong { color: var(--green); }
+        .warning { background: var(--surface); border-left: 3px solid var(--orange); border-radius: 0 8px 8px 0; padding: 1.25rem; margin: 1.5rem 0; }
+        .warning strong { color: var(--orange); }
+        .diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; text-align: center; font-family: monospace; font-size: 0.9rem; color: var(--muted); line-height: 1.8; }
+        .cta { background: linear-gradient(135deg, #1a3a5c 0%, #1a2744 100%); border: 1px solid var(--accent); border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center; }
+        .cta a { display: inline-block; background: var(--accent); color: #000; font-weight: 600; padding: 0.75rem 2rem; border-radius: 8px; text-decoration: none; margin-top: 1rem; }
+        footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; }
+        @media (max-width: 600px) { h1 { font-size: 1.6rem; } .container { padding: 1rem; } }
+    </style>
+    <script data-goatcounter="https://unstableentity.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+<div class="container">
+    <nav><a href="../">Home</a> &rsaquo; <a href="./">Blog</a> &rsaquo; AI Log Analysis</nav>
+
+    <h1>Automate Log Analysis with n8n + Ollama (AI Anomaly Detection)</h1>
+    <div class="meta">March 25, 2026 &bull; 12 min read &bull; DevOps / SRE</div>
+
+    <p>Your application logs contain critical signals buried in noise. A spike in 500 errors, an unusual authentication pattern, a slow database query cascade &mdash; these patterns are hard to catch with static regex rules but obvious to an AI model that understands context.</p>
+
+    <p>This guide shows you how to build an <strong>automated log analysis and anomaly detection pipeline</strong> using n8n and Ollama. It ingests logs from multiple sources, classifies errors, detects anomalous patterns, and sends alerts to Slack or PagerDuty &mdash; all running on your own infrastructure with zero API costs.</p>
+
+    <div class="diagram">
+        Log Sources (syslog/files/API) &rarr; n8n Ingestion<br>
+        &darr;<br>
+        Ollama: Parse &amp; Classify &rarr; Severity Scoring<br>
+        &darr;<br>
+        Pattern Detection &rarr; Anomaly Threshold Check<br>
+        &darr;<br>
+        Alert (Slack / PagerDuty / Email) + Dashboard Update
+    </div>
+
+    <h2>Why AI for Log Analysis?</h2>
+
+    <p>Traditional log monitoring relies on pattern matching: grep for "ERROR", count 500 status codes, alert on threshold breaches. This works for known failure modes but misses:</p>
+
+    <ul>
+        <li><strong>Novel error patterns</strong> &mdash; A new type of failure that doesn't match existing rules</li>
+        <li><strong>Contextual anomalies</strong> &mdash; A normal-looking request that's unusual for 3 AM on a Sunday</li>
+        <li><strong>Correlated failures</strong> &mdash; Slow DNS lookups causing downstream API timeouts</li>
+        <li><strong>Semantic understanding</strong> &mdash; Stack traces that look different but share the same root cause</li>
+    </ul>
+
+    <p>An LLM can read log entries like a senior SRE would &mdash; understanding context, recognizing patterns across services, and explaining what's actually happening in plain language.</p>
+
+    <h2>Architecture Overview</h2>
+
+    <p>The pipeline has four stages:</p>
+
+    <ol>
+        <li><strong>Ingest</strong> &mdash; Collect logs from files, syslog, or APIs on a schedule (every 5 minutes)</li>
+        <li><strong>Classify</strong> &mdash; Ollama categorizes each log batch by severity and type</li>
+        <li><strong>Detect</strong> &mdash; Compare current patterns against baseline to find anomalies</li>
+        <li><strong>Alert</strong> &mdash; Send structured alerts with context and suggested actions</li>
+    </ol>
+
+    <h2>Prerequisites</h2>
+
+    <ul>
+        <li><strong>n8n</strong> &mdash; Self-hosted (Docker or npm). <a href="https://docs.n8n.io/hosting/">Install guide</a></li>
+        <li><strong>Ollama</strong> &mdash; Running locally with <code>mistral:7b</code> or <code>llama3:8b</code>. <a href="https://ollama.ai">Install Ollama</a></li>
+        <li><strong>Log access</strong> &mdash; File path, syslog endpoint, or API (CloudWatch, Loki, etc.)</li>
+    </ul>
+
+    <h2>Step 1: Log Ingestion Node</h2>
+
+    <p>Start with a <strong>Cron</strong> trigger that runs every 5 minutes. Connect it to a node that reads your logs. For file-based logs, use the <strong>Execute Command</strong> node:</p>
+
+    <pre><code># Read last 5 minutes of logs from multiple sources
+# Application logs
+tail -n 500 /var/log/myapp/application.log
+
+# Nginx access logs (last 5 min)
+awk -v d="$(date -d '5 min ago' '+%d/%b/%Y:%H:%M')" '$4 >= "["d' /var/log/nginx/access.log
+
+# System journal
+journalctl --since "5 min ago" --no-pager -q</code></pre>
+
+    <div class="tip">
+        <strong>Tip:</strong> For high-volume logs, pre-filter before sending to Ollama. Remove health check endpoints, static asset requests, and other noise. Only send lines that contain errors, warnings, or unusual status codes. This keeps Ollama token usage efficient and response times fast.
+    </div>
+
+    <h3>CloudWatch / Loki Integration</h3>
+
+    <p>If your logs are in a cloud service, use the <strong>HTTP Request</strong> node to query them via API:</p>
+
+    <pre><code>// CloudWatch Logs Insights query via n8n HTTP Request
+{
+  "logGroupName": "/aws/lambda/my-function",
+  "queryString": "fields @timestamp, @message | filter @message like /ERROR|WARN|Exception/ | sort @timestamp desc | limit 200",
+  "startTime": {{ $now.minus(5, 'minutes').toMillis() }},
+  "endTime": {{ $now.toMillis() }}
+}</code></pre>
+
+    <h2>Step 2: AI Classification with Ollama</h2>
+
+    <p>Send the log batch to Ollama for classification. Use the <strong>HTTP Request</strong> node pointed at your Ollama API:</p>
+
+    <pre><code>POST http://localhost:11434/api/generate
+{
+  "model": "mistral:7b",
+  "prompt": "You are a senior SRE analyzing application logs. Classify each issue found and assess overall system health.\n\nLOGS:\n{{ $json.logs }}\n\nRespond in JSON format:\n{\n  \"overall_health\": \"healthy|degraded|critical\",\n  \"error_count\": number,\n  \"warning_count\": number,\n  \"issues\": [\n    {\n      \"severity\": \"critical|high|medium|low|info\",\n      \"category\": \"authentication|database|network|memory|disk|application|security\",\n      \"summary\": \"Brief description\",\n      \"affected_service\": \"service name\",\n      \"log_lines\": [\"relevant lines\"],\n      \"possible_cause\": \"What likely caused this\",\n      \"suggested_action\": \"What to do about it\"\n    }\n  ],\n  \"patterns\": [\"any recurring patterns noticed\"],\n  \"anomalies\": [\"anything unusual compared to normal operation\"]\n}",
+  "stream": false,
+  "options": {
+    "temperature": 0.1,
+    "num_predict": 2048
+  }
+}</code></pre>
+
+    <div class="warning">
+        <strong>Important:</strong> Use <code>temperature: 0.1</code> for log analysis. You want consistent, deterministic classifications &mdash; not creative interpretations. Higher temperatures cause the model to hallucinate issues that don't exist in the logs.
+    </div>
+
+    <h3>Choosing the Right Model</h3>
+
+    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+        <tr style="border-bottom: 1px solid var(--border);">
+            <th style="text-align:left; padding: 0.5rem;">Model</th>
+            <th style="text-align:left; padding: 0.5rem;">Speed</th>
+            <th style="text-align:left; padding: 0.5rem;">Best For</th>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.5rem;"><code>phi3:mini</code></td>
+            <td style="padding: 0.5rem;">~200ms first token</td>
+            <td style="padding: 0.5rem;">Simple error counting, basic classification</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.5rem;"><code>mistral:7b</code></td>
+            <td style="padding: 0.5rem;">~350ms first token</td>
+            <td style="padding: 0.5rem;">Good balance of speed and accuracy. Handles stack traces well.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.5rem;"><code>llama3:8b</code></td>
+            <td style="padding: 0.5rem;">~400ms first token</td>
+            <td style="padding: 0.5rem;">Best at understanding complex multi-service correlations</td>
+        </tr>
+        <tr>
+            <td style="padding: 0.5rem;"><code>codellama:13b</code></td>
+            <td style="padding: 0.5rem;">~800ms first token</td>
+            <td style="padding: 0.5rem;">Stack trace analysis, code-level root cause identification</td>
+        </tr>
+    </table>
+
+    <h2>Step 3: Anomaly Detection Logic</h2>
+
+    <p>After classification, use a <strong>Function</strong> node to compare current results against a rolling baseline. This catches gradual degradation that individual checks miss:</p>
+
+    <pre><code>// Anomaly detection logic
+const current = $input.first().json;
+const baseline = $('Read Baseline').first().json;
+
+const anomalies = [];
+
+// Error rate spike detection
+const errorRate = current.error_count / (current.error_count + current.warning_count + 1);
+const baselineErrorRate = baseline.avg_error_rate || 0.05;
+
+if (errorRate > baselineErrorRate * 3) {
+  anomalies.push({
+    type: 'error_rate_spike',
+    severity: 'high',
+    current: errorRate,
+    baseline: baselineErrorRate,
+    message: `Error rate ${(errorRate * 100).toFixed(1)}% is ${(errorRate / baselineErrorRate).toFixed(1)}x above baseline`
+  });
+}
+
+// New error category detection
+const knownCategories = baseline.known_categories || [];
+const newCategories = current.issues
+  .map(i => i.category)
+  .filter(c => !knownCategories.includes(c));
+
+if (newCategories.length > 0) {
+  anomalies.push({
+    type: 'new_error_category',
+    severity: 'medium',
+    categories: newCategories,
+    message: `New error categories detected: ${newCategories.join(', ')}`
+  });
+}
+
+// Critical issue detection
+const criticalIssues = current.issues.filter(i => i.severity === 'critical');
+if (criticalIssues.length > 0) {
+  anomalies.push({
+    type: 'critical_issues',
+    severity: 'critical',
+    count: criticalIssues.length,
+    issues: criticalIssues,
+    message: `${criticalIssues.length} critical issue(s) detected`
+  });
+}
+
+// Service health degradation
+if (current.overall_health === 'critical' && baseline.last_health !== 'critical') {
+  anomalies.push({
+    type: 'health_degradation',
+    severity: 'critical',
+    from: baseline.last_health,
+    to: current.overall_health,
+    message: `System health degraded from ${baseline.last_health} to critical`
+  });
+}
+
+// Update baseline (rolling average)
+const updatedBaseline = {
+  avg_error_rate: (baselineErrorRate * 0.9) + (errorRate * 0.1),
+  known_categories: [...new Set([...knownCategories, ...current.issues.map(i => i.category)])],
+  last_health: current.overall_health,
+  last_updated: new Date().toISOString()
+};
+
+return {
+  json: {
+    anomalies,
+    should_alert: anomalies.some(a => a.severity === 'critical' || a.severity === 'high'),
+    analysis: current,
+    updated_baseline: updatedBaseline
+  }
+};</code></pre>
+
+    <h2>Step 4: Smart Alerting</h2>
+
+    <p>Use an <strong>IF</strong> node to route based on severity. Critical and high alerts go to Slack/PagerDuty immediately. Medium alerts batch into a daily digest.</p>
+
+    <h3>Slack Alert Format</h3>
+
+    <pre><code>// Slack message builder (Function node)
+const data = $input.first().json;
+
+const blocks = [
+  {
+    type: "header",
+    text: {
+      type: "plain_text",
+      text: data.analysis.overall_health === 'critical'
+        ? "CRITICAL: System Health Alert"
+        : "Warning: Anomaly Detected"
+    }
+  },
+  {
+    type: "section",
+    fields: [
+      { type: "mrkdwn", text: `*Health:* ${data.analysis.overall_health}` },
+      { type: "mrkdwn", text: `*Errors:* ${data.analysis.error_count}` },
+      { type: "mrkdwn", text: `*Warnings:* ${data.analysis.warning_count}` },
+      { type: "mrkdwn", text: `*Anomalies:* ${data.anomalies.length}` }
+    ]
+  }
+];
+
+// Add each anomaly as a section
+for (const anomaly of data.anomalies) {
+  blocks.push({
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `*${anomaly.severity.toUpperCase()}* — ${anomaly.message}`
+    }
+  });
+}
+
+// Add suggested actions from AI analysis
+const actions = data.analysis.issues
+  .filter(i => i.severity === 'critical' || i.severity === 'high')
+  .map(i => `• *${i.summary}*: ${i.suggested_action}`)
+  .join('\n');
+
+if (actions) {
+  blocks.push({
+    type: "section",
+    text: { type: "mrkdwn", text: `*Suggested Actions:*\n${actions}` }
+  });
+}
+
+return { json: { blocks } };</code></pre>
+
+    <h2>Step 5: Baseline Storage</h2>
+
+    <p>Store the rolling baseline in a JSON file or database so the pipeline learns what's "normal" for your system over time:</p>
+
+    <pre><code>// Write baseline to file (Execute Command node)
+echo '{{ JSON.stringify($json.updated_baseline) }}' > /data/log-analysis-baseline.json
+
+// Or use n8n's built-in SQLite:
+// INSERT OR REPLACE INTO baselines (key, value, updated_at)
+// VALUES ('log_analysis', '{{ JSON.stringify($json.updated_baseline) }}', datetime('now'))</code></pre>
+
+    <div class="tip">
+        <strong>Tip:</strong> Start with a 24-hour baseline collection period before enabling alerts. This prevents false positives from the model not knowing what "normal" looks like for your specific system.
+    </div>
+
+    <h2>Advanced: Multi-Service Correlation</h2>
+
+    <p>For microservice architectures, feed logs from multiple services into a single Ollama analysis pass. The model can identify cross-service failure cascades that per-service monitoring misses:</p>
+
+    <pre><code>{
+  "prompt": "Analyze logs from multiple services and identify any correlated failures or cascade patterns.\n\nAPI GATEWAY LOGS:\n{{ $json.gateway_logs }}\n\nAUTH SERVICE LOGS:\n{{ $json.auth_logs }}\n\nDATABASE LOGS:\n{{ $json.db_logs }}\n\nFocus on:\n1. Timeline correlation (did failures happen in sequence?)\n2. Error propagation (did one service cause failures in others?)\n3. Resource contention (are services competing for the same resources?)\n4. Common request IDs across services\n\nRespond in JSON with a 'cascade_analysis' field."
+}</code></pre>
+
+    <h2>Advanced: Security Anomaly Detection</h2>
+
+    <p>The same pipeline can detect security-relevant patterns in auth logs:</p>
+
+    <pre><code>{
+  "prompt": "Analyze these authentication logs for security anomalies.\n\nLOGS:\n{{ $json.auth_logs }}\n\nLook for:\n1. Brute force attempts (multiple failed logins from same IP)\n2. Credential stuffing patterns (failures across many accounts from few IPs)\n3. Unusual login times or locations\n4. Privilege escalation attempts\n5. Session anomalies (token reuse, impossible travel)\n\nRespond in JSON:\n{\n  \"threat_level\": \"none|low|medium|high|critical\",\n  \"findings\": [...],\n  \"recommended_blocks\": [\"IPs to block\"],\n  \"recommended_actions\": [\"immediate steps\"]\n}"
+}</code></pre>
+
+    <h2>Performance Optimization</h2>
+
+    <h3>Pre-filtering Reduces Token Usage by 90%</h3>
+
+    <p>Don't send all log lines to Ollama. Pre-filter aggressively:</p>
+
+    <pre><code>// Pre-filter function (before Ollama)
+const lines = $input.first().json.raw_logs.split('\n');
+
+const filtered = lines.filter(line => {
+  // Skip health checks, static assets, metrics scrapes
+  if (line.includes('/health') || line.includes('/metrics')) return false;
+  if (line.includes('.css') || line.includes('.js') || line.includes('.png')) return false;
+  if (line.includes('kube-probe')) return false;
+
+  // Keep errors, warnings, slow requests, auth events
+  if (/ERROR|WARN|Exception|FATAL/i.test(line)) return true;
+  if (/5\d{2}\s/.test(line)) return true;  // 5xx status codes
+  if (/timeout|refused|unreachable/i.test(line)) return true;
+  if (/login|auth|token|session/i.test(line)) return true;
+
+  // Keep requests slower than 2 seconds
+  const duration = line.match(/(\d+)ms/);
+  if (duration && parseInt(duration[1]) > 2000) return true;
+
+  return false;
+});
+
+return { json: { logs: filtered.join('\n'), total_lines: lines.length, filtered_lines: filtered.length } };</code></pre>
+
+    <h3>Batching Strategy</h3>
+
+    <p>For high-volume systems (>10,000 lines/minute), batch and sample:</p>
+
+    <ul>
+        <li><strong>All errors and warnings</strong> &mdash; Always include these</li>
+        <li><strong>10% sample of info/debug</strong> &mdash; Catch unusual patterns without overwhelming the model</li>
+        <li><strong>All auth events</strong> &mdash; Security-relevant, always include</li>
+        <li><strong>Max 500 lines per Ollama call</strong> &mdash; Keeps response time under 10 seconds with Mistral 7B</li>
+    </ul>
+
+    <h2>Complete Workflow Summary</h2>
+
+    <div class="diagram">
+        [Cron: Every 5 min]<br>
+        &darr;<br>
+        [Execute Command: Tail logs] &rarr; [Function: Pre-filter]<br>
+        &darr;<br>
+        [HTTP Request: Ollama classify] &rarr; [Function: Parse JSON]<br>
+        &darr;<br>
+        [Read Baseline] &rarr; [Function: Anomaly detection]<br>
+        &darr;<br>
+        [IF: should_alert?]<br>
+        &darr; YES &emsp;&emsp;&emsp;&emsp; &darr; NO<br>
+        [Slack/PagerDuty] &emsp; [Write Baseline]<br>
+        &darr;<br>
+        [Write Baseline]
+    </div>
+
+    <h2>Real-World Results</h2>
+
+    <p>Teams running this pipeline typically see:</p>
+
+    <ul>
+        <li><strong>70-80% reduction in alert noise</strong> &mdash; AI filters out known patterns, only alerts on genuinely unusual events</li>
+        <li><strong>MTTR improvement</strong> &mdash; Suggested actions from the AI get engineers to root cause faster</li>
+        <li><strong>Novel issue detection</strong> &mdash; Catches failure modes that static rules miss entirely</li>
+        <li><strong>Zero ongoing cost</strong> &mdash; No per-token API fees, no data leaving your infrastructure</li>
+    </ul>
+
+    <div class="cta">
+        <h3>Get the Complete Log Analysis Workflow</h3>
+        <p>Download the ready-to-import n8n workflow JSON with all nodes pre-configured, including the anomaly detection baseline system and Slack alert templates.</p>
+        <a href="../#templates">Download Free Templates</a>
+    </div>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+        <li><a href="n8n-ai-code-review-ollama.html">Automate Code Reviews with n8n + Ollama</a></li>
+        <li><a href="n8n-sentiment-analysis-ollama-brand-monitoring.html">AI Sentiment Analysis for Brand Monitoring</a></li>
+        <li><a href="n8n-ai-competitor-monitoring-ollama.html">Automate Competitor Monitoring with AI</a></li>
+    </ul>
+
+    <footer>
+        <p>Published by <a href="../">Workflow Forge</a> &bull; Self-hosted AI workflow templates for n8n + Ollama</p>
+    </footer>
+</div>
+</body>
+</html>

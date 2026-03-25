@@ -5,8 +5,15 @@
     <link>https://bonskari.github.io/n8n-ai-workflows/</link>
     <description>Free tutorials for building self-hosted AI automation workflows with n8n and Ollama. No API keys, no cloud costs, full privacy.</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 25 Mar 2026 14:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 25 Mar 2026 17:00:00 +0000</lastBuildDate>
     <atom:link href="https://bonskari.github.io/n8n-ai-workflows/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Automate Log Analysis with n8n + Ollama (AI Anomaly Detection)</title>
+      <link>https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-log-analysis-ollama-anomaly-detection.html</link>
+      <guid>https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-log-analysis-ollama-anomaly-detection.html</guid>
+      <pubDate>Tue, 25 Mar 2026 17:00:00 +0000</pubDate>
+      <description>Build an automated log analysis and anomaly detection pipeline with n8n and Ollama. Classify errors, detect patterns, get smart alerts with suggested actions. Self-hosted, private, no API costs. Free workflow template.</description>
+    </item>
     <item>
       <title>Automate Competitor Monitoring with n8n + Ollama (AI Market Intelligence)</title>
       <link>https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-competitor-monitoring-ollama.html</link>
