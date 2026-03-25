@@ -5,8 +5,15 @@
     <link>https://bonskari.github.io/n8n-ai-workflows/</link>
     <description>Free tutorials for building self-hosted AI automation workflows with n8n and Ollama. No API keys, no cloud costs, full privacy.</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 25 Mar 2026 10:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 25 Mar 2026 14:00:00 +0000</lastBuildDate>
     <atom:link href="https://bonskari.github.io/n8n-ai-workflows/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Automate Competitor Monitoring with n8n + Ollama (AI Market Intelligence)</title>
+      <link>https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-competitor-monitoring-ollama.html</link>
+      <guid>https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-competitor-monitoring-ollama.html</guid>
+      <pubDate>Tue, 25 Mar 2026 14:00:00 +0000</pubDate>
+      <description>Build an automated competitor monitoring system with n8n and Ollama. Track pricing changes, feature launches, and content strategies. Daily AI-powered intelligence reports. Replaces $15K-50K/year tools. Free workflow template.</description>
+    </item>
     <item>
       <title>Automate AI Translation with n8n + Ollama (Self-Hosted Content Localization Workflow)</title>
       <link>https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-translation-ollama-localization.html</link>

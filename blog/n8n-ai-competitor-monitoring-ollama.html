@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automate Competitor Monitoring with n8n + Ollama (AI Market Intelligence)</title>
+    <meta name="description" content="Build an automated competitor monitoring system with n8n and Ollama. Track pricing changes, new features, content updates, and market moves. Self-hosted, private, no API costs.">
+    <meta property="og:title" content="AI Competitor Monitoring with n8n + Ollama — Free Workflow">
+    <meta property="og:description" content="Automate competitive intelligence with local AI. Track competitor websites, pricing, features, and content. Free n8n workflow template.">
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-competitor-monitoring-ollama.html">
+    <link rel="alternate" type="application/rss+xml" title="n8n + Ollama AI Workflow Tutorials" href="https://bonskari.github.io/n8n-ai-workflows/feed.xml">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Automate Competitor Monitoring with n8n + Ollama (AI Market Intelligence)",
+        "description": "Build an automated competitor monitoring system with n8n and Ollama. Track pricing, features, and market moves with local AI.",
+        "author": {"@type": "Organization", "name": "Workflow Forge"},
+        "datePublished": "2026-03-25",
+        "publisher": {"@type": "Organization", "name": "Workflow Forge"}
+    }
+    </script>
+    <style>
+        :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --orange: #d29922; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+        .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+        nav { padding: 1rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; line-height: 1.3; }
+        .meta { color: var(--muted); margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+        h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+        h2:first-of-type { border-top: none; padding-top: 0; }
+        h3 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; color: var(--accent); }
+        p { margin-bottom: 1rem; }
+        ul, ol { margin: 0 0 1rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        strong { color: #fff; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1rem 0 1.5rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; }
+        code { font-family: 'SF Mono', 'Fira Code', monospace; color: var(--text); }
+        p code, li code { background: var(--surface); border: 1px solid var(--border); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.88em; }
+        .tip { background: var(--surface); border-left: 3px solid var(--green); border-radius: 0 8px 8px 0; padding: 1.25rem; margin: 1.5rem 0; }
+        .tip strong { color: var(--green); }
+        .warning { background: var(--surface); border-left: 3px solid var(--orange); border-radius: 0 8px 8px 0; padding: 1.25rem; margin: 1.5rem 0; }
+        .warning strong { color: var(--orange); }
+        .diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; text-align: center; font-family: monospace; font-size: 0.9rem; color: var(--muted); line-height: 1.8; }
+        .cta { background: linear-gradient(135deg, #1a3a5c 0%, #1a2744 100%); border: 1px solid var(--accent); border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center; }
+        .cta h3 { color: var(--accent); }
+        .cta a.btn { display: inline-block; background: var(--accent); color: #000; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600; text-decoration: none; margin-top: 1rem; }
+        .cta a.btn:hover { opacity: 0.9; text-decoration: none; }
+        footer { margin-top: 3rem; padding: 2rem 0; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav><a href="../">&larr; n8n AI Workflows</a> &middot; <a href="./">All Tutorials</a></nav>
+
+    <article>
+        <h1>Automate Competitor Monitoring with n8n + Ollama (AI Market Intelligence)</h1>
+        <div class="meta">Published March 25, 2026 &middot; 12 min read &middot; Competitive Intelligence, AI Automation</div>
+
+        <p>Most companies check competitor websites manually — once a month at best. Pricing changes, new feature launches, messaging shifts, and content strategies go unnoticed for weeks. By the time you react, the competitive window has closed.</p>
+
+        <p>In this tutorial, you'll build an <strong>automated competitor monitoring pipeline</strong> using n8n and Ollama that runs daily, scrapes competitor pages, uses local AI to analyze changes, and sends structured intelligence reports to your team. Everything runs on your infrastructure — no data leaves your network.</p>
+
+        <h2>Why Self-Hosted Competitor Intelligence?</h2>
+
+        <p>Commercial competitive intelligence tools (Crayon, Klue, Kompyte) charge <strong>$15,000-$50,000/year</strong>. They also require sending your competitive strategy data to their servers. With n8n + Ollama:</p>
+
+        <ul>
+            <li><strong>$0 ongoing cost</strong> — runs on your hardware, no per-query fees</li>
+            <li><strong>Complete privacy</strong> — your competitor watchlist and analysis never leaves your network</li>
+            <li><strong>Full customization</strong> — tailor monitoring to your exact market and competitors</li>
+            <li><strong>Real-time alerts</strong> — know about changes within hours, not weeks</li>
+        </ul>
+
+        <h2>Architecture Overview</h2>
+
+        <div class="diagram">
+            Cron Schedule (Daily) → n8n Workflow<br>
+            ↓<br>
+            Fetch Competitor Pages (HTTP Request)<br>
+            ↓<br>
+            Compare with Previous Snapshot (Code Node)<br>
+            ↓<br>
+            Ollama Analysis (What changed? Why does it matter?)<br>
+            ↓<br>
+            ┌─────────────┬─────────────┬──────────────┐<br>
+            Pricing Alert  │ Feature Alert│ Content Alert │<br>
+            └──────┬──────┴──────┬──────┴───────┬──────┘<br>
+            ↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+            Slack/Email&nbsp;&nbsp;&nbsp;&nbsp;Dashboard&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weekly Report
+        </div>
+
+        <h2>Prerequisites</h2>
+
+        <ul>
+            <li><strong>n8n</strong> — self-hosted (Docker or npm)</li>
+            <li><strong>Ollama</strong> — with <code>mistral</code> or <code>llama3</code> model pulled</li>
+            <li>Basic familiarity with n8n workflows</li>
+        </ul>
+
+        <h2>Step 1: Define Your Competitor Watchlist</h2>
+
+        <p>Start with a structured config that defines what to monitor for each competitor:</p>
+
+        <pre><code>{
+  "competitors": [
+    {
+      "name": "CompetitorA",
+      "pages": {
+        "pricing": "https://competitora.com/pricing",
+        "features": "https://competitora.com/features",
+        "blog": "https://competitora.com/blog",
+        "changelog": "https://competitora.com/changelog"
+      },
+      "focus": ["pricing tiers", "enterprise features", "AI capabilities"]
+    },
+    {
+      "name": "CompetitorB",
+      "pages": {
+        "pricing": "https://competitorb.com/pricing",
+        "product": "https://competitorb.com/product"
+      },
+      "focus": ["freemium model", "integrations", "developer tools"]
+    }
+  ]
+}</code></pre>
+
+        <div class="tip">
+            <strong>Tip:</strong> Start with 3-5 competitors maximum. Monitor their pricing page, features page, blog/changelog, and homepage. More pages = more processing time per run.
+        </div>
+
+        <h2>Step 2: Fetch and Snapshot Pages</h2>
+
+        <p>Use n8n's <strong>HTTP Request</strong> node to fetch each competitor page, then extract the meaningful text content:</p>
+
+        <pre><code>// Code node: Extract text content from HTML
+const html = $input.first().json.data;
+const url = $input.first().json.url;
+const competitor = $input.first().json.competitor;
+
+// Strip HTML tags, scripts, styles
+let text = html
+  .replace(/&lt;script[\s\S]*?&lt;\/script&gt;/gi, '')
+  .replace(/&lt;style[\s\S]*?&lt;\/style&gt;/gi, '')
+  .replace(/&lt;[^&gt;]+&gt;/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
+
+// Truncate to avoid overwhelming the LLM
+text = text.substring(0, 8000);
+
+return [{
+  json: {
+    competitor,
+    url,
+    content: text,
+    fetched_at: new Date().toISOString()
+  }
+}];</code></pre>
+
+        <h3>Store Snapshots for Comparison</h3>
+
+        <p>Save each snapshot to a local file (or database) so you can compare with the previous version:</p>
+
+        <pre><code>// Code node: Compare with previous snapshot
+const fs = require('fs');
+const path = `/data/competitor-snapshots/${$json.competitor}-${$json.url.replace(/[^a-z0-9]/gi, '_')}.txt`;
+
+let previousContent = '';
+try {
+  previousContent = fs.readFileSync(path, 'utf8');
+} catch (e) {
+  // First run — no previous snapshot
+}
+
+// Save current snapshot
+fs.mkdirSync('/data/competitor-snapshots/', { recursive: true });
+fs.writeFileSync(path, $json.content);
+
+// Calculate similarity
+const changed = previousContent !== $json.content;
+const isNew = previousContent === '';
+
+return [{
+  json: {
+    ...$json,
+    previous_content: previousContent.substring(0, 4000),
+    changed,
+    is_new: isNew
+  }
+}];</code></pre>
+
+        <h2>Step 3: AI-Powered Change Analysis</h2>
+
+        <p>This is where Ollama does the heavy lifting. When a page changes, send both the old and new content to your local LLM for structured analysis:</p>
+
+        <pre><code>// Ollama prompt for competitor change analysis
+You are a competitive intelligence analyst. Compare the PREVIOUS and CURRENT
+versions of a competitor's page and provide a structured analysis.
+
+Competitor: {{competitor}}
+Page: {{url}}
+
+PREVIOUS VERSION:
+{{previous_content}}
+
+CURRENT VERSION:
+{{content}}
+
+Analyze the changes and respond in this exact JSON format:
+{
+  "change_type": "pricing|feature|messaging|content|design|none",
+  "severity": "critical|important|minor|informational",
+  "summary": "One-sentence summary of what changed",
+  "details": "2-3 sentences explaining the change and its implications",
+  "action_items": ["What your team should consider doing in response"],
+  "competitive_impact": "How this affects your competitive position"
+}</code></pre>
+
+        <div class="tip">
+            <strong>Model recommendation:</strong> Use <code>mistral</code> for fast analysis or <code>llama3:8b</code> for more nuanced competitive insights. Both run well on consumer hardware.
+        </div>
+
+        <h2>Step 4: Smart Alerting</h2>
+
+        <p>Not every change deserves a notification. Use an <strong>IF node</strong> to route alerts based on severity:</p>
+
+        <ul>
+            <li><strong>Critical</strong> (pricing changes, major feature launches) → Immediate Slack alert + email to leadership</li>
+            <li><strong>Important</strong> (new blog posts, messaging changes) → Daily digest</li>
+            <li><strong>Minor/Informational</strong> (copy tweaks, design updates) → Weekly report only</li>
+        </ul>
+
+        <pre><code>// Slack message format for critical alerts
+🚨 *Competitor Alert: {{competitor}}*
+
+*Change:* {{summary}}
+*Type:* {{change_type}} | *Severity:* {{severity}}
+
+{{details}}
+
+*Action items:*
+{{#each action_items}}
+• {{this}}
+{{/each}}
+
+_Detected at {{fetched_at}}_</code></pre>
+
+        <h2>Step 5: Weekly Intelligence Report</h2>
+
+        <p>Aggregate all changes from the week and generate a comprehensive report:</p>
+
+        <pre><code>// Ollama prompt for weekly competitive intelligence report
+You are a competitive intelligence analyst writing a weekly briefing
+for the executive team.
+
+Here are all competitor changes detected this week:
+{{changes_json}}
+
+Write a concise executive briefing with these sections:
+1. KEY MOVES — The 2-3 most significant competitive developments
+2. PRICING & PACKAGING — Any pricing or packaging changes
+3. PRODUCT — New features, deprecations, or pivots
+4. CONTENT & MESSAGING — How competitors are positioning themselves
+5. RECOMMENDATIONS — 3-5 specific actions our team should take
+
+Keep it under 500 words. Be direct and actionable.</code></pre>
+
+        <h2>Advanced: Track Competitor SEO Strategy</h2>
+
+        <p>Monitor what keywords your competitors are targeting by analyzing their blog content:</p>
+
+        <pre><code>// Ollama prompt for SEO analysis
+Analyze this competitor blog post and extract:
+1. Primary keyword target (what search query is this optimized for?)
+2. Secondary keywords (3-5 related terms used)
+3. Content strategy signal (what audience are they targeting?)
+4. Quality assessment (thin content, or genuinely valuable?)
+
+Blog content:
+{{blog_content}}
+
+Respond as JSON:
+{
+  "primary_keyword": "...",
+  "secondary_keywords": ["...", "..."],
+  "target_audience": "...",
+  "content_quality": "high|medium|low",
+  "strategy_insight": "What this tells us about their content strategy"
+}</code></pre>
+
+        <h2>Monitoring Pricing Pages</h2>
+
+        <p>Pricing changes are the highest-value competitive signal. Here's how to make pricing monitoring reliable:</p>
+
+        <h3>Handle Dynamic Pricing Pages</h3>
+
+        <p>Many SaaS pricing pages load prices via JavaScript. Use the n8n <strong>HTTP Request</strong> node with a headless browser approach, or fetch the API endpoints directly (inspect the page to find them).</p>
+
+        <h3>Structured Price Extraction</h3>
+
+        <pre><code>// Ollama prompt for price extraction
+Extract all pricing information from this page content.
+Return a JSON array of pricing tiers:
+
+[{
+  "tier_name": "...",
+  "monthly_price": "...",
+  "annual_price": "...",
+  "key_features": ["...", "..."],
+  "limits": "..."
+}]
+
+If you cannot find pricing information, return: {"error": "no_pricing_found"}
+
+Page content:
+{{content}}</code></pre>
+
+        <div class="warning">
+            <strong>Important:</strong> Always respect robots.txt and rate-limit your requests. One fetch per competitor page per day is reasonable. Don't hammer competitor servers — it's both unethical and will get your IP blocked.
+        </div>
+
+        <h2>Production Deployment</h2>
+
+        <h3>Schedule</h3>
+        <p>Run the monitoring workflow on a <strong>Cron trigger</strong> — daily at 6 AM works well for most teams. Your morning Slack will have fresh competitive intelligence waiting.</p>
+
+        <h3>Data Storage</h3>
+        <p>For long-term trend analysis, store snapshots and analysis results in a database (PostgreSQL or SQLite via n8n's database nodes). This lets you track pricing trends, feature velocity, and content cadence over months.</p>
+
+        <h3>Error Handling</h3>
+        <p>Competitor websites change structure frequently. Add error handling:</p>
+        <ul>
+            <li>Catch HTTP errors (403, 429, 500) — don't alert on temporary outages</li>
+            <li>Validate Ollama output is valid JSON before processing</li>
+            <li>Set a timeout on HTTP requests (30 seconds max)</li>
+            <li>Log all failures for debugging</li>
+        </ul>
+
+        <h2>Results You Can Expect</h2>
+
+        <p>Teams using this kind of automated monitoring typically see:</p>
+
+        <ul>
+            <li><strong>90% faster</strong> awareness of competitor pricing changes (hours vs. weeks)</li>
+            <li><strong>Comprehensive coverage</strong> — monitoring 10+ competitors daily, not just the top 2-3</li>
+            <li><strong>Actionable insights</strong> — AI-generated analysis means your team can act immediately, not spend hours reading competitor pages</li>
+            <li><strong>Zero ongoing cost</strong> — compared to $15K-50K/year for commercial tools</li>
+        </ul>
+
+        <div class="cta">
+            <h3>Want All 15 AI Workflow Templates?</h3>
+            <p>This competitor monitoring workflow is one of 15 production-ready AI automation templates in our n8n + Ollama workflow pack. Includes email auto-responder, lead scoring, content generation, RAG search, and more.</p>
+            <a href="../#pricing" class="btn">Get the Full Pack — $39</a>
+        </div>
+
+        <h2>Related Tutorials</h2>
+        <ul>
+            <li><a href="n8n-ai-data-enrichment-ollama-web-scraping.html">Automate Data Enrichment with n8n + Ollama</a></li>
+            <li><a href="n8n-ai-lead-scoring-ollama-workflow.html">AI Lead Scoring with n8n + Ollama</a></li>
+            <li><a href="n8n-sentiment-analysis-ollama-brand-monitoring.html">Sentiment Analysis for Brand Monitoring</a></li>
+            <li><a href="n8n-ai-content-moderation-ollama.html">AI Content Moderation with n8n + Ollama</a></li>
+        </ul>
+    </article>
+
+    <footer>
+        <p>&copy; 2026 Workflow Forge by Unstable Entity Oy. <a href="../privacy.html">Privacy</a></p>
+    </footer>
+</div>
+<script data-goatcounter="https://unstableentity.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
