@@ -134,6 +134,25 @@ A: The free samples are 3 complete workflows. The full pack adds 8 more workflow
 
 ---
 
+## Tutorials & Guides
+
+Step-by-step guides for building AI automation workflows with n8n + Ollama:
+
+- [Getting Started with Self-Hosted AI Workflows](https://bonskari.github.io/n8n-ai-workflows/blog/self-hosted-ai-workflows-n8n-ollama.html)
+- [Complete n8n + Ollama Tutorial](https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ollama-tutorial-local-ai-automation.html)
+- [AI Email Auto-Responder](https://bonskari.github.io/n8n-ai-workflows/blog/automate-email-responses-n8n-ollama.html)
+- [AI Lead Scoring Pipeline](https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-lead-scoring-ollama-workflow.html)
+- [Private RAG Knowledge Base](https://bonskari.github.io/n8n-ai-workflows/blog/n8n-rag-knowledge-base-ollama-private.html)
+- [AI Customer Support Automation](https://bonskari.github.io/n8n-ai-workflows/blog/n8n-customer-support-automation-ollama.html)
+- [AI Invoice Data Extraction](https://bonskari.github.io/n8n-ai-workflows/blog/n8n-invoice-data-extraction-ollama.html)
+- [AI Code Review Automation](https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-code-review-ollama.html)
+- [AI Content Moderation](https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-content-moderation-ollama.html)
+- [AI Product Descriptions for E-Commerce](https://bonskari.github.io/n8n-ai-workflows/blog/n8n-ai-product-descriptions-ollama-ecommerce.html)
+
+[View all tutorials ->](https://bonskari.github.io/n8n-ai-workflows/)
+
+---
+
 ## Star History
 
 If this repo helped you, give it a star! It helps others discover these workflows.
